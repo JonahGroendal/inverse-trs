@@ -1,0 +1,33 @@
+{
+  "name": "volatility-swap",
+  "version": "1.0.0",
+  "description": "Algorithmic ultra-stablecoin system with a market-determined collateralization ratio and a corresponding unstablecoin leveraged asset.",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JonahGroendal/volatility-swap.git"
+  },
+  "keywords": [
+    "stablecoin",
+    "unstablecoin",
+    "algorithmic",
+    "leverage",
+    "leveraged",
+    "ETH",
+    "ERC20",
+    "solidity",
+    "ethereum"
+  ],
+  "author": "Jonah Groendal",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/JonahGroendal/volatility-swap/issues"
+  },
+  "homepage": "https://github.com/JonahGroendal/volatility-swap#readme"
+}
