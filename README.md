@@ -25,10 +25,10 @@ L varies with R such that the following is always true:
 ## The MakerDAO Killer
 The products offered by VSSS are very similar to those of MakerDAO but require zero maintainence, have no fees and are easier to conceptualize. Similar to DAI, VSSS's stablecoin is overcollateralized with an underlying asset such as ETH. And similar to a CDP, VSSS's unstablecoin offers leveraged exposure to such an underlying asset. But, unlike a CDP, VSSS's unstablecoin is just a token like any other. It's fungable and highly liquid and, as such, can be bought and sold on exchanges with little hastle or premiums. It's also much simpler to dial in the exact amount of leverage you want.
   
-### Lets demostrate the equivalence to MakerDAO by considering some common positions:
-For simplicity, we'll assume that we have 1 ETH we want to leverage, and that the VSSS is collateralized at a ratio of 1.5, the same as MakerDAO.
+### Equivalence to MakerDAO
+Lets demostrate the equivalence to MakerDAO by considering some common use cases. For simplicity, we'll assume the VSSS is collateralized at a ratio of 1.5, the same as MakerDAO.
 #### Maximum leverage
-The maximum leverage we can achieve in either system is 3x (though in VSSS this varies)
+We start with 1 ETH. The maximum leverage we can achieve in either system is 3x (though in VSSS this varies).
 
 In MakerDAO, we need to open a CDP by locking up our 1 ETH. This allows us to borrow DAI which we can sell for .66 ETH, putting us at a leverage ratio of 1.6.
 
@@ -37,3 +37,4 @@ To achieve the same result in VSSS, we simply buy .33 ETH worth of the unstablec
 In MakerDAO, if we want more leverage we can repeat the above process with our .66 ETH, leaving us with .44 ETH and another CDP. We can keep doing this until we get close to the maximum 3x leverage. At this point we'll have multiple CDPs we need to maintain to avoid liquidations and their resulting fees.
 
 In VSSS we just buy 1 ETH worth of unstablecoins. This will put us at 3x leverage with nothing to worry about but a downward price swing 😬.
+
