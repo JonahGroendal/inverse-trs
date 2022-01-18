@@ -7,8 +7,8 @@ where R = C/S
 
 L varies with R such that the following is always true:
 
-    +---------------+
-    |  L = R/(R-1)  |
-    +---------------+
+    
+   | L = R / (R - 1) |
+   |-------------|
 
 R is found via market forces.
