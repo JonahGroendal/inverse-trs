@@ -1,5 +1,7 @@
 # Volatility Swap Stablecoin System
-There are two tokens, a stablecoin and an unstablecoin, both collateralized with the same underlying asset. The stablecoin maintains a peg to a target asset, for example USD, via a price feed. Conversely, the unstablecoin offeres leveraged exposure to the underlying asset. Essentially, stablecoin holders are forfeiting their potential gains to unstablecoin holders in exchange for taking on their downside risk.
+VSSS has two product offerings, a stablecoin and an unstablecoin.  
+  
+Both tokens are collateralized with the same underlying asset. The stablecoin maintains a peg to a target asset, for example USD, via a price feed. Conversely, the unstablecoin offeres leveraged exposure to the underlying asset. Essentially, stablecoin holders are forfeiting their upside potential to unstablecoin holders in exchange for taking on their downside risk.
 
 ## Properties of the system
 L = leverage of the unstable (i.e. leveraged) coin  
@@ -23,12 +25,15 @@ L varies with R such that the following is always true:
 
 
 ## The MakerDAO Killer
-The products offered by VSSS are very similar to those of MakerDAO but require zero maintainence, have no fees and are easier to conceptualize. Similar to DAI, VSSS's stablecoin is overcollateralized with an underlying asset such as ETH. And similar to a CDP, VSSS's unstablecoin offers leveraged exposure to such an underlying asset. But, unlike a CDP, VSSS's unstablecoin is just a token like any other. It's fungable and highly liquid and, as such, can be bought and sold on exchanges with little hastle or premiums. It's also much simpler to dial in the exact amount of leverage you want.
+VSSS is better than MakerDAO in every way.
+  
+The products offered by VSSS are very similar to those of MakerDAO but require zero maintainence, have no fees and are easier to conceptualize. Similar to DAI, VSSS's stablecoin is overcollateralized with an underlying asset such as ETH. And similar to a CDP, VSSS's unstablecoin offers leveraged exposure to said underlying asset. But, unlike a CDP, VSSS's unstablecoin is just a token like any other. It's fungable and highly liquid and, as such, can be bought and sold on exchanges with little hastle or premiums. It's also much simpler to dial in the exact amount of leverage you want.
   
 ### Equivalence to MakerDAO
-Lets demostrate the equivalence to MakerDAO by considering some common use cases. For simplicity, we'll assume the VSSS is collateralized at a ratio of 1.5, the same as MakerDAO.
+Lets walk through some common use cases to demostrate the equivalence to MakerDAO. For simplicity, we'll assume the VSSS is collateralized at a ratio of 1.5, the same as MakerDAO.
+
 #### Maximum leverage
-We start with 1 ETH. The maximum leverage we can achieve in either system is 3x (though in VSSS this varies).
+We want to leverage our 1 ETH. The maximum we can achieve in either system is 3x (though in VSSS this varies).
 
 In MakerDAO, we need to open a CDP by locking up our 1 ETH. This allows us to borrow DAI which we can sell for .66 ETH, putting us at a leverage ratio of 1.6.
 
@@ -38,3 +43,21 @@ In MakerDAO, if we want more leverage we can repeat the above process with our .
 
 In VSSS we just buy 1 ETH worth of unstablecoins. This will put us at 3x leverage with nothing to worry about but a downward price swing 😬.
 
+### Borrowing
+MakerDAO allows for borrowing against ...TODO
+
+### Divergence From MakerDAO
+#### Better Stability with a Variable Collateralization Ratio
+VSSS's stablecoin achieves greater stability than MakerDAO's DAI by allowing the collateralization ratio to vary with market forces.  
+  
+DAI has maintained its peg well for the vast majority of its existence, but durring a sharp drop in ETH price in March of 2020, DAI deviated from its peg by over 20%. I believe a hard collateralization ratio was at least partially to blame for the extreme deviation. Burning mass quantities of DAI through CDP liquidations and deleveraging caused demand for DAI to outstrip supply.
+  
+VSSS always buys back (and burns) its stablecoins at a rate such that the stablecoin exactly holds its peg. To do so at any greater or lesser rate would, by the law of supply and demand, break the peg. This is achieved very simply: users can sell their stablecoins back to the VSSS to be burned at any time for exactly the peg amount. The can also mint new stablecoins for the peg amount.
+
+#### No Interest Rate or Fees
+Unlike MakerDAO, VSSS doesn't have a DAO that siphons value out of the system through interest rates or liquidation fees.  
+The VSSS is much simpler than MakerDAO, requiring no external services or auction mechanisms. This removes the need for even necessary fees.
+
+#### Single Collateral Type Per System
+DAI is collateralized with a mix of assets, including ETH, BAT, and USDC. Having a diverse porfolio of collateral assets mitigates risk of the system becoming undercollateralized.  
+Each VSSS is collateralized with only one asset, but multliple VSSSs will be deployed, each with its own collateral. This allows the trader a choice in the types and ratios of the collateral underlying their hedge. A blended stablecoin contract is planned to mix various VSSS stablecoins into one.
