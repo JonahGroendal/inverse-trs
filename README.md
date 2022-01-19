@@ -48,11 +48,13 @@ MakerDAO allows for borrowing against ...TODO
 
 ### Divergence From MakerDAO
 #### Better Stability with a Variable Collateralization Ratio
-VSSS's stablecoin achieves greater stability than MakerDAO's DAI by allowing the collateralization ratio to vary with market forces.  
+VSSS's stablecoin should achieve greater stability than MakerDAO's DAI by allowing the collateralization ratio to vary with market forces.  
   
 DAI has maintained its peg well for the vast majority of its existence, but durring a sharp drop in ETH price in March 2020, DAI deviated from its peg by over 20%. I believe a hard collateralization ratio was at least partially to blame for the extreme deviation. Burning mass quantities of DAI through CDP liquidations and deleveraging caused demand for DAI to outstrip supply.
   
 VSSS always buys back (and burns) its stablecoins at a rate such that the stablecoin exactly holds its peg. To do so at any greater or lesser rate would, by the law of supply and demand, break the peg. This is achieved very simply: users can sell their stablecoins back to the VSSS to be burned at any time for exactly the peg amount. They can also mint new stablecoins for the peg amount.
+
+A high collateralization ratio has its merits, but it's not worth sacrificing stability for. And breaking the peg in a positive direction is not any better than breaking it in a negative direction.
 
 #### No Interest Rate or Fees
 Unlike MakerDAO, VSSS doesn't have a DAO that siphons value out of the system through interest rates or liquidation fees.  
