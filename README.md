@@ -18,6 +18,9 @@ L varies with R such that the following is always true:
 | --------------- |
   
   
+<img src="https://user-images.githubusercontent.com/13501607/150663503-7f72bbd7-2fb9-46fb-9ca5-0dc333cd9ddb.png" width="50%" height="50%">
+
+  
 - Market forces determine R and keep it above 1:  
   - As R falls closer to 1:  
     - L increases asymptotically toward infinity, increasing demand for the unstablecoin. R rises again as unstablecoins are bought.  
