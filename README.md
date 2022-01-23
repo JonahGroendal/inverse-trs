@@ -28,7 +28,7 @@ L varies with R such that the following is always true:
 
 
 ## The MakerDAO Killer
-The products offered by VSSS are very similar to those of MakerDAO but require zero maintainence, have no fees and are easier to conceptualize. Similar to DAI, VSSS's stablecoin is overcollateralized with an underlying asset such as ETH. And similar to a CDP, VSSS's unstablecoin offers leveraged exposure to said underlying asset. But, unlike CDPs, VSSS's unstablecoins are fungible just like any other token. They're liquid and can be bought or sold on exchanges with little hastle or premiums.
+The products offered by VSSS are very similar to those of MakerDAO but require zero maintainence, have no fees and are easier to conceptualize. Similar to DAI, VSSS's stablecoin is overcollateralized with an underlying asset such as ETH. And similar to a CDP, VSSS's unstablecoin offers leveraged exposure to said underlying asset. But, unlike MakerDAO's CDPs, VSSS's unstablecoins are fungible just like any other token. They're liquid and can be bought or sold on exchanges with little hastle or premiums.
   
 ### Equivalence to MakerDAO
 Lets walk through some common use cases to demostrate the equivalence to MakerDAO. For simplicity, we'll assume the VSSS is collateralized at a ratio of 1.5, the same as MakerDAO.
