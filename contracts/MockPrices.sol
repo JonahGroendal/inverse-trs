@@ -3,7 +3,7 @@ pragma solidity >=0.4.22 <0.9.0;
 import "./IPrices.sol";
 
 contract MockPrices is IPrices {
-    uint private _target = 1000*10^18;
+    uint private _target = 1000*(10**18);
 
     function target() public view override returns (uint) {
         return _target;

@@ -29,5 +29,8 @@
   "bugs": {
     "url": "https://github.com/JonahGroendal/volatility-swap/issues"
   },
-  "homepage": "https://github.com/JonahGroendal/volatility-swap#readme"
+  "homepage": "https://github.com/JonahGroendal/volatility-swap#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.4.2"
+  }
 }

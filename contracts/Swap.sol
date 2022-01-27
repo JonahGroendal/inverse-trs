@@ -1,26 +1,31 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 import "./IPrices.sol";
+import "./IToken.sol";
 
 /// @dev if collateralization ratio drops below 1, stablecoin holders can claim their share of the remaining collateral but the system needs to be redeployed.
 contract Swap {
+    /// @notice minimum total value of leverage in underlying
+    /// @dev prevents leverage `totalSupply` from growing too quickly and overflowing
+    uint constant MIN_LEV_TOTAL_VALUE = 10**13;
+
     /// @notice Provides price of underlying in target asset
-    Prices prices;
+    IPrices private prices;
 
     /// @notice The stablecoin. Value pegged to target asset
-    ERC20 private hedge;
+    IToken private hedge;
 
     /// @notice The unstablecoin. Gives leveraged exposure to underlying asset.
-    ERC20 private leverage;
+    IToken private leverage;
 
     /// @notice The token collateralizing hedge token / underlying leverage token
-    ERC20 private underlying;
+    IToken private underlying;
 
     constructor(address _price, address _hedge, address _leverage, address _underlying) {
-        price      = PriceOracle(_price);
-        hedge      = ERC20(_hedge);
-        leverage   = ERC20(_leverage);
-        underlying = ERC20(_underlying);
+        prices     = IPrices(_price);
+        hedge      = IToken(_hedge);
+        leverage   = IToken(_leverage);
+        underlying = IToken(_underlying);
     }
 
     /// @notice Buy `amount` hedge tokens
@@ -36,7 +41,7 @@ contract Swap {
         uint value = hedgeValue(amount);
         require(value > 0);
         underlying.transfer(msg.sender, value - prices.hedgeSellPremium());
-        hedge.burn(msg.sender, amount);
+        hedge.burnFrom(msg.sender, amount);
     }
 
     /// @notice Buy `amount` leverage tokens
@@ -52,7 +57,7 @@ contract Swap {
         uint value = leverageValue(amount);
         require(value > 0);
         underlying.transfer(msg.sender, value - prices.leverageSellPremium());
-        leverage.burn(amount);
+        leverage.burnFrom(msg.sender, amount);
     }
 
     /// @notice Value of `amount` leverage tokens in underlying tokens
@@ -62,7 +67,7 @@ contract Swap {
         if (leverage.totalSupply() == 0)
             return amount;
         uint totalValue = leverageTotalValue();
-        require(totalValue > 10^15);
+        require(totalValue > 10**15);
         return amount*totalValue/leverage.totalSupply();
     }
 
@@ -74,16 +79,16 @@ contract Swap {
     /// @return Value in underlying of `amount` hedge tokens
     function hedgeValue(uint amount) internal view returns (uint) {
         uint lastPrice = prices.target();
-        uint totalValue = hedge.totalSupply()*10^18/lastPrice;
+        uint totalValue = hedge.totalSupply()*(10**18)/lastPrice;
         uint balance = underlying.balanceOf(address(this));
         if (balance < totalValue)
             return amount*balance/hedge.totalSupply();
-        return amount*10^18/lastPrice;
+        return amount*(10**18)/lastPrice;
     }
 
     /// @return Value in underlying of all hedge tokens
     function hedgeTotalValue() internal view returns (uint) {
-        uint totalValue = hedge.totalSupply()*10^18/prices.target();
+        uint totalValue = hedge.totalSupply()*(10**18)/prices.target();
         uint balance = underlying.balanceOf(address(this));
         if (balance < totalValue)
             return balance;
