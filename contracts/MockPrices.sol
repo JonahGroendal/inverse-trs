@@ -8,16 +8,16 @@ contract MockPrices is IPrices {
     function target() public view override returns (uint) {
         return _target;
     }
-    function hedgeBuyPremium() public view override returns (uint) {
+    function hedgeBuyPremium(uint amount) public view override returns (uint) {
         return 0;
     }
-    function hedgeSellPremium() public view override returns (uint) {
+    function hedgeSellPremium(uint amount) public view override returns (uint) {
         return 0;
     }
-    function leverageBuyPremium() public view override returns (uint) {
+    function leverageBuyPremium(uint amount) public view override returns (uint) {
         return 0;
     }
-    function leverageSellPremium() public view override returns (uint) {
+    function leverageSellPremium(uint amount) public view override returns (uint) {
         return 0;
     }
 

@@ -31,32 +31,32 @@ contract Swap {
     /// @notice Buy `amount` hedge tokens
     function buyHedge(uint amount) public {
         uint value = hedgeValue(amount);
-        require(value > 0);
-        underlying.transferFrom(msg.sender, address(this), value + prices.hedgeBuyPremium());
+        require(value > 0, "zero value");
+        underlying.transferFrom(msg.sender, address(this), value + prices.hedgeBuyPremium(value));
         hedge.mint(msg.sender, amount);
     }
 
     /// @notice Sell `amount` hedge tokens
     function sellHedge(uint amount) public {
         uint value = hedgeValue(amount);
-        require(value > 0);
-        underlying.transfer(msg.sender, value - prices.hedgeSellPremium());
+        require(value > 0, "zero value");
+        underlying.transfer(msg.sender, value - prices.hedgeSellPremium(value));
         hedge.burnFrom(msg.sender, amount);
     }
 
     /// @notice Buy `amount` leverage tokens
     function buyLeverage(uint amount) public {
         uint value = leverageValue(amount);
-        require(value > 0);
-        underlying.transferFrom(msg.sender, address(this), value + prices.leverageBuyPremium());
+        require(value > 0, "zero value");
+        underlying.transferFrom(msg.sender, address(this), value + prices.leverageBuyPremium(value));
         leverage.mint(msg.sender, amount);
     }
 
     /// @notice Sell `amount` leverage tokens
     function sellLeverage(uint amount) public {
         uint value = leverageValue(amount);
-        require(value > 0);
-        underlying.transfer(msg.sender, value - prices.leverageSellPremium());
+        require(value > 0, "zero value");
+        underlying.transfer(msg.sender, value - prices.leverageSellPremium(value));
         leverage.burnFrom(msg.sender, amount);
     }
 
@@ -67,7 +67,7 @@ contract Swap {
         if (leverage.totalSupply() == 0)
             return amount;
         uint totalValue = leverageTotalValue();
-        require(totalValue > 10**15);
+        require(totalValue > 10**15, "protecting against potential totalSupply overflow");
         return amount*totalValue/leverage.totalSupply();
     }
 

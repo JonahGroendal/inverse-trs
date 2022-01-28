@@ -7,7 +7,7 @@ const MockWETH = artifacts.require("MockWETH");
 
 module.exports = async function (deployer, network, accounts) {
   await deployer.deploy(MockPrices)
-  await deployer.deploy(MockWETH)
+  await deployer.deploy(MockWETH, accounts)
 
   const tokenH = await deployer.deploy(Token, "Hedged WETH", "EUSD", accounts[0])
   const tokenL = await deployer.deploy(Token, "Leveraged WETH", "LETH", accounts[0])
