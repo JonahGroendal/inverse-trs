@@ -608,5 +608,135 @@ contract("Swap", async accounts => {
         assert.equal(wethBalsAfter[1].sub(wethBalsBefore[1]).toString(), expectedWethChange(75).add(new BN(1)).toString());
     })
 
+
+    /*
+     * This is half finished but decided to go a diffrent route with frontrunning protection.
+     * Committing what I have so far. This test isn't currently working.
+    */
+    it("should take correct amount of a LETH buyer's deposit if price rises right after purchase" , async () => {
+        // should take:
+        // [WETH value of position after price increase] - [WETH value paid for position]
+
+        const swap = await Swap.deployed()
+        const weth = await MockWETH.deployed()
+        const eusd = await Token.at(contractAddrs.EUSD)
+        const leth = await Token.at(contractAddrs.LETH)
+        const prices = await MockRates.deployed()
+
+        const wethBalsBefore = [
+            await weth.balanceOf.call(accounts[0]),
+            await weth.balanceOf.call(accounts[1]),
+        ]
+
+        const LEVERAGE = 3
+        const DEPOSIT_BASE_RATE = 0.1
+
+        const expectedDeposits = [
+            toWei(25*DEPOSIT_BASE_RATE*LEVERAGE),
+            toWei(75*DEPOSIT_BASE_RATE*LEVERAGE),
+            toWei(115*DEPOSIT_BASE_RATE),
+            toWei(85*DEPOSIT_BASE_RATE)
+        ]
+
+        const depositInfos = []
+
+        await prices.setTarget(toWei(1000))
+        await prices.setTargetAt(toWei(1000))
+        await prices.setDepositBaseRate(toWei(DEPOSIT_BASE_RATE))
+        await weth.approve(swap.address, toWei( 25).add(expectedDeposits[0]), { from: accounts[0] })
+        await weth.approve(swap.address, toWei( 75).add(expectedDeposits[1]), { from: accounts[1] })
+        await weth.approve(swap.address, toWei(115).add(expectedDeposits[2]), { from: accounts[2] })
+        await weth.approve(swap.address, toWei( 85).add(expectedDeposits[3]), { from: accounts[3] })
+        depositInfos.push(await swap.buyLeverage.call(toWei( 25), { from: accounts[0] }));
+        await swap.buyLeverage(toWei( 25), { from: accounts[0] });
+        depositInfos.push(await swap.buyLeverage.call(toWei( 75), { from: accounts[1] }));
+        await swap.buyLeverage(toWei( 75), { from: accounts[1] });
+        await swap.buyHedge(toWei(115000), { from: accounts[2] });
+        await swap.buyHedge(toWei( 85000), { from: accounts[3] });
+
+        console.log("depositInfos", depositInfos)
+
+        const wethBalsMid = [
+            await weth.balanceOf.call(accounts[0]),
+            await weth.balanceOf.call(accounts[1])
+        ]
+
+        await prices.setTarget(toWei(1400))
+        await prices.setTargetAfterDelay(toWei(1400))
+        await prices.setDepositBaseRate(toWei(0))
+        await leth.approve(swap.address, toWei(    25), { from: accounts[0] })
+        await leth.approve(swap.address, toWei(    75), { from: accounts[1] })
+        await eusd.approve(swap.address, toWei(115000), { from: accounts[2] })
+        await eusd.approve(swap.address, toWei( 85000), { from: accounts[3] })
+        await swap.sellLeverage(toWei( 25), { from: accounts[0] });
+        await swap.sellLeverage(toWei( 75), { from: accounts[1] });
+        await swap.sellHedge(toWei(115000), { from: accounts[2] });
+        await swap.sellHedge(toWei( 85000), { from: accounts[3] });
+
+        const wethBalsAfter = [
+            await weth.balanceOf.call(accounts[0]),
+            await weth.balanceOf.call(accounts[1])
+        ]
+
+        const depositInfoTypes = ['address', 'bool', 'bool', 'uint', 'uint', 'uint', 'uint']
+        
+        const getDeposit = (depositInfo) => (
+            swap.deposits.call(web3.utils.sha3(web3.eth.abi.encodeParameters(depositInfoTypes, depositInfo)))
+        )
+        
+        const depositValues = [
+            await getDeposit(depositInfos[0]),
+            await getDeposit(depositInfos[1])
+        ]
+
+        console.log("depositValues", depositValues.map(d => d.toString()))
+
+        const wethProfitsIfNoDeposit = [
+            wethBalsAfter[0].sub(wethBalsBefore[0]).add(depositValues[0]),
+            wethBalsAfter[1].sub(wethBalsBefore[1]).add(depositValues[1])
+        ]
+
+        console.log('wethProfits', wethProfitsIfNoDeposit)
+
+        assert.equal(wethBalsMid[0].sub(wethBalsBefore[0]).toString(), toWei(-25*(1+(0.1*LEVERAGE))).toString());
+        assert.equal(wethBalsMid[1].sub(wethBalsBefore[1]).toString(), toWei(-75*(1+(0.1*LEVERAGE))).toString());
+    })
+
+
+    it("should take correct amount of a LETH seller's deposit if price falls right after purchase" , async () => {
+        // should take:
+        // [WETH value position was sold for] - [WETH value of position after price decrease]
+    })
+
+
+    it("should take correct amount of an EUSD buyers's deposit if price falls right after purchase" , async () => {
+        // should take:
+        // [WETH value of position after price decrease] - [WETH value paid for position]
+    })
+
+
+    it("should take correct amount of an EUSD seller's deposit if price rises right after purchase" , async () => {
+        // should take:
+        // [WETH value position was sold for] - [WETH value of position after price increase]
+    })
+
     
+    it("should return a LETH buyer's full deposit if price falls or remains the same right after purchase" , async () => {
+        
+    })
+
+
+    it("should return a LETH seller's full deposit if price rises or remains the same right after purchase" , async () => {
+        
+    })
+
+
+    it("should return an EUSD buyers's full deposit if price rises or remains the same right after purchase" , async () => {
+        
+    })
+
+
+    it("should return an EUSD seller's full deposit if price falls or remains the same right after purchase" , async () => {
+        
+    })
 })

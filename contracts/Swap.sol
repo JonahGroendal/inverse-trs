@@ -32,7 +32,7 @@ contract Swap {
         uint swapValue;  // swap value in underlying
         uint levRatio;   // leverage ratio of the token when it was bought or sold
     }
-    mapping(bytes32 => uint) deposits; // keccak256(abi.encode(DepositInfo)) => deposit value
+    mapping(bytes32 => uint) public deposits; // keccak256(abi.encode(DepositInfo)) => deposit value
 
     uint totalDeposits;
 
