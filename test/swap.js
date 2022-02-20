@@ -608,5 +608,31 @@ contract("Swap", async accounts => {
         assert.equal(wethBalsAfter[1].sub(wethBalsBefore[1]).toString(), expectedWethChange(75).add(new BN(1)).toString());
     })
 
+
+    it("should revert if priority fee is greater than the maximum allowed", async () => {
+        const swap = await Swap.deployed()
+        const weth = await MockWETH.deployed()
+        const eusd = await Token.at(contractAddrs.EUSD)
+        const leth = await Token.at(contractAddrs.LETH)
+
+        await weth.approve(swap.address, toWei(10))
+        
+        try {
+            await swap.buyHedge(toWei(10000), { maxPriorityFeePerGas: 4000000000 })
+        } catch(e) {
+            return;
+        }
+        assert.fail();
+    })
+
+    it("should not revert if priority fee is the maximum allowed", async () => {
+        const swap = await Swap.deployed()
+        const weth = await MockWETH.deployed()
+        const eusd = await Token.at(contractAddrs.EUSD)
+        const leth = await Token.at(contractAddrs.LETH)
+
+        await weth.approve(swap.address, toWei(10))
+        await swap.buyHedge(toWei(10000), { maxPriorityFeePerGas: 3000000000 })
+    })
     
 })

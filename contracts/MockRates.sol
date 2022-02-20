@@ -1,4 +1,4 @@
-pragma solidity ^0.8.2;
+pragma solidity ^0.8.11;
 
 import "./IRates.sol";
 
@@ -8,6 +8,12 @@ contract MockRates is IRates {
     function target() public view override returns (uint) {
         return _target;
     }
+
+    function maxPriorityFee() public view override returns (uint) {
+        return 3000000000;
+    }
+
+
     function hedgeBuyPremium(uint amount) public view override returns (uint) {
         return 0;
     }

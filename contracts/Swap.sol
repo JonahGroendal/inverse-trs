@@ -1,4 +1,4 @@
-pragma solidity ^0.8.2;
+pragma solidity ^0.8.11;
 
 import "./IRates.sol";
 import "./IToken.sol";
@@ -28,8 +28,15 @@ contract Swap {
         underlying = IToken(_underlying);
     }
 
+    /// @notice limit TX priority to prevent fruntrunning price oracle updates
+    /// @notice Also should delay transaction to prevent trading on advanced price knowledge.
+    modifier limitedPriority {
+        require(tx.gasprice - block.basefee <= rates.maxPriorityFee(), "Priority fee too high");
+        _;
+    }
+
     /// @notice Buy `amount` hedge tokens
-    function buyHedge(uint amount) public {
+    function buyHedge(uint amount) public limitedPriority {
         uint value = hedgeValue(amount);
         require(value > 0, "zero value");
         underlying.transferFrom(msg.sender, address(this), value + rates.hedgeBuyPremium(value));
@@ -37,7 +44,7 @@ contract Swap {
     }
 
     /// @notice Sell `amount` hedge tokens
-    function sellHedge(uint amount) public {
+    function sellHedge(uint amount) public limitedPriority {
         uint value = hedgeValue(amount);
         require(value > 0, "zero value");
         underlying.transfer(msg.sender, value - rates.hedgeSellPremium(value));
@@ -45,7 +52,7 @@ contract Swap {
     }
 
     /// @notice Buy `amount` leverage tokens
-    function buyLeverage(uint amount) public {
+    function buyLeverage(uint amount) public limitedPriority {
         uint value = leverageValue(amount);
         require(value > 0, "zero value");
         underlying.transferFrom(msg.sender, address(this), value + rates.leverageBuyPremium(value));
@@ -53,7 +60,7 @@ contract Swap {
     }
 
     /// @notice Sell `amount` leverage tokens
-    function sellLeverage(uint amount) public {
+    function sellLeverage(uint amount) public limitedPriority {
         uint value = leverageValue(amount);
         require(value > 0, "zero value");
         underlying.transfer(msg.sender, value - rates.leverageSellPremium(value));
