@@ -1,8 +1,8 @@
 pragma solidity >=0.4.22 <0.9.0;
 
-import "./IPrices.sol";
+import "./IRatesBasic.sol";
 
-contract MockPrices is IPrices {
+contract MockRatesBasic is IRatesBasic {
     uint private _target = 1000*(10**18);
 
     function target() public view override returns (uint) {
@@ -25,3 +25,4 @@ contract MockPrices is IPrices {
         _target = t;
     }
 }
+
