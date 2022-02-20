@@ -1,6 +1,6 @@
 pragma solidity >=0.4.22 <0.9.0;
 
-import "./IPrices.sol";
+import "./IRates.sol";
 import "./IToken.sol";
 
 /// @dev if collateralization ratio drops below 1, stablecoin holders can claim their share of the remaining collateral but the system needs to be redeployed.
@@ -10,7 +10,7 @@ contract Swap {
     uint constant MIN_LEV_TOTAL_VALUE = 10**13;
 
     /// @notice Provides price of underlying in target asset
-    IPrices private prices;
+    IRates private rates;
 
     /// @notice The stablecoin. Value pegged to target asset
     IToken private hedge;
@@ -21,8 +21,8 @@ contract Swap {
     /// @notice The token collateralizing hedge token / underlying leverage token
     IToken private underlying;
 
-    constructor(address _price, address _hedge, address _leverage, address _underlying) {
-        prices     = IPrices(_price);
+    constructor(address _rates, address _hedge, address _leverage, address _underlying) {
+        rates      = IRates(_rates);
         hedge      = IToken(_hedge);
         leverage   = IToken(_leverage);
         underlying = IToken(_underlying);
@@ -32,7 +32,7 @@ contract Swap {
     function buyHedge(uint amount) public {
         uint value = hedgeValue(amount);
         require(value > 0, "zero value");
-        underlying.transferFrom(msg.sender, address(this), value + prices.hedgeBuyPremium(value));
+        underlying.transferFrom(msg.sender, address(this), value + rates.hedgeBuyPremium(value));
         hedge.mint(msg.sender, amount);
     }
 
@@ -40,7 +40,7 @@ contract Swap {
     function sellHedge(uint amount) public {
         uint value = hedgeValue(amount);
         require(value > 0, "zero value");
-        underlying.transfer(msg.sender, value - prices.hedgeSellPremium(value));
+        underlying.transfer(msg.sender, value - rates.hedgeSellPremium(value));
         hedge.burnFrom(msg.sender, amount);
     }
 
@@ -48,7 +48,7 @@ contract Swap {
     function buyLeverage(uint amount) public {
         uint value = leverageValue(amount);
         require(value > 0, "zero value");
-        underlying.transferFrom(msg.sender, address(this), value + prices.leverageBuyPremium(value));
+        underlying.transferFrom(msg.sender, address(this), value + rates.leverageBuyPremium(value));
         leverage.mint(msg.sender, amount);
     }
 
@@ -56,7 +56,7 @@ contract Swap {
     function sellLeverage(uint amount) public {
         uint value = leverageValue(amount);
         require(value > 0, "zero value");
-        underlying.transfer(msg.sender, value - prices.leverageSellPremium(value));
+        underlying.transfer(msg.sender, value - rates.leverageSellPremium(value));
         leverage.burnFrom(msg.sender, amount);
     }
 
@@ -78,7 +78,7 @@ contract Swap {
 
     /// @return Value in underlying of `amount` hedge tokens
     function hedgeValue(uint amount) internal view returns (uint) {
-        uint lastPrice = prices.target();
+        uint lastPrice = rates.target();
         uint totalValue = hedge.totalSupply()*(10**18)/lastPrice;
         uint balance = underlying.balanceOf(address(this));
         if (balance < totalValue)
@@ -88,7 +88,7 @@ contract Swap {
 
     /// @return Value in underlying of all hedge tokens
     function hedgeTotalValue() internal view returns (uint) {
-        uint totalValue = hedge.totalSupply()*(10**18)/prices.target();
+        uint totalValue = hedge.totalSupply()*(10**18)/rates.target();
         uint balance = underlying.balanceOf(address(this));
         if (balance < totalValue)
             return balance;

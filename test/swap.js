@@ -5,7 +5,7 @@ const BN = web3.utils.BN
 const Swap = artifacts.require("Swap")
 const MockWETH = artifacts.require("MockWETH")
 const Token = artifacts.require("Token")
-const MockPrices = artifacts.require("MockPrices")
+const MockRates = artifacts.require("MockRates")
 
 const toWei = amount => (new BN(amount*10000000000)).mul((new BN(10)).pow(new BN(8)))
 
@@ -108,7 +108,7 @@ contract("Swap", async accounts => {
         const weth = await MockWETH.deployed()
         const eusd = await Token.at(contractAddrs.EUSD)
         const leth = await Token.at(contractAddrs.LETH)
-        const prices = await MockPrices.deployed()
+        const prices = await MockRates.deployed()
 
         
         const targetBefore = 1000;
@@ -180,7 +180,7 @@ contract("Swap", async accounts => {
         const weth = await MockWETH.deployed()
         const eusd = await Token.at(contractAddrs.EUSD)
         const leth = await Token.at(contractAddrs.LETH)
-        const prices = await MockPrices.deployed()
+        const prices = await MockRates.deployed()
 
         await weth.approve(swap.address, toWei( 2.077), { from: accounts[0] })
         await weth.approve(swap.address, toWei(10.101), { from: accounts[1] })
