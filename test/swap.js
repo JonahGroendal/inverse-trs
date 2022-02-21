@@ -9,14 +9,23 @@ const MockRates = artifacts.require("MockRates")
 
 const toWei = amount => (new BN(amount*10000000000)).mul((new BN(10)).pow(new BN(8)))
 
-contract("Swap", async accounts => {
+contract("Swap", accounts => {
+    let swap;
+    let weth;
+    let eusd;
+    let leth;
+    let prices;
+
+    beforeEach(async () => {
+        swap = await Swap.deployed()
+        weth = await MockWETH.deployed()
+        eusd = await Token.at(contractAddrs.EUSD)
+        leth = await Token.at(contractAddrs.LETH)
+        prices = await MockRates.deployed()
+    })
+
 
     it("should mint 10,000 EUSD in exchange for 10 WETH", async () => {
-        const swap = await Swap.deployed()
-        const weth = await MockWETH.deployed()
-        const eusd = await Token.at(contractAddrs.EUSD)
-        const leth = await Token.at(contractAddrs.LETH)
-
         const wethBalBefore = await weth.balanceOf.call(accounts[0])
         const eusdBalBefore = await eusd.balanceOf.call(accounts[0])
         const lethBalBefore = await leth.balanceOf.call(accounts[0])
@@ -35,11 +44,6 @@ contract("Swap", async accounts => {
 
 
     it("should burn 10,000 EUSD and return 10 WETH", async () => {
-        const swap = await Swap.deployed()
-        const weth = await MockWETH.deployed()
-        const eusd = await Token.at(contractAddrs.EUSD)
-        const leth = await Token.at(contractAddrs.LETH)
-
         const wethBalBefore = await weth.balanceOf.call(accounts[0])
         const eusdBalBefore = await eusd.balanceOf.call(accounts[0])
         const lethBalBefore = await leth.balanceOf.call(accounts[0])
@@ -58,11 +62,6 @@ contract("Swap", async accounts => {
 
 
     it("should mint 10 LETH in exchange for 10 WETH", async () => {
-        const swap = await Swap.deployed()
-        const weth = await MockWETH.deployed()
-        const eusd = await Token.at(contractAddrs.EUSD)
-        const leth = await Token.at(contractAddrs.LETH)
-
         const wethBalBefore = await weth.balanceOf.call(accounts[0])
         const eusdBalBefore = await eusd.balanceOf.call(accounts[0])
         const lethBalBefore = await leth.balanceOf.call(accounts[0])
@@ -81,11 +80,6 @@ contract("Swap", async accounts => {
 
 
     it("should burn 10 LETH and return 10 WETH", async () => {
-        const swap = await Swap.deployed()
-        const weth = await MockWETH.deployed()
-        const eusd = await Token.at(contractAddrs.EUSD)
-        const leth = await Token.at(contractAddrs.LETH)
-
         const wethBalBefore = await weth.balanceOf.call(accounts[0])
         const eusdBalBefore = await eusd.balanceOf.call(accounts[0])
         const lethBalBefore = await leth.balanceOf.call(accounts[0])
@@ -104,13 +98,6 @@ contract("Swap", async accounts => {
 
 
     it("should return rest of WETH to EUSD holders when undercollateralized", async () => {
-        const swap = await Swap.deployed()
-        const weth = await MockWETH.deployed()
-        const eusd = await Token.at(contractAddrs.EUSD)
-        const leth = await Token.at(contractAddrs.LETH)
-        const prices = await MockRates.deployed()
-
-        
         const targetBefore = 1000;
 
         await weth.approve(swap.address, toWei( 2.077), { from: accounts[0] })
@@ -176,12 +163,6 @@ contract("Swap", async accounts => {
 
 
     it("should maintian peg when WETH price drops", async () => {
-        const swap = await Swap.deployed()
-        const weth = await MockWETH.deployed()
-        const eusd = await Token.at(contractAddrs.EUSD)
-        const leth = await Token.at(contractAddrs.LETH)
-        const prices = await MockRates.deployed()
-
         await weth.approve(swap.address, toWei( 2.077), { from: accounts[0] })
         await weth.approve(swap.address, toWei(10.101), { from: accounts[1] })
         await weth.approve(swap.address, toWei(  .304), { from: accounts[2] })
@@ -237,12 +218,6 @@ contract("Swap", async accounts => {
 
 
     it("should maintian peg when WETH price rises", async () => {
-        const swap = await Swap.deployed()
-        const weth = await MockWETH.deployed()
-        const eusd = await Token.at(contractAddrs.EUSD)
-        const leth = await Token.at(contractAddrs.LETH)
-        const prices = await MockRates.deployed()
-
         await prices.setTarget(toWei(1000))
         await weth.approve(swap.address, toWei( 2.077), { from: accounts[0] })
         await weth.approve(swap.address, toWei(10.101), { from: accounts[1] })
@@ -299,12 +274,6 @@ contract("Swap", async accounts => {
 
 
     it("should give  2x leveraged loss to LETH holders when WETH price drops with system at a 2.0 coll ratio", async () => {
-        const swap = await Swap.deployed()
-        const weth = await MockWETH.deployed()
-        const eusd = await Token.at(contractAddrs.EUSD)
-        const leth = await Token.at(contractAddrs.LETH)
-        const prices = await MockRates.deployed()
-
         const wethBalsBefore = [
             await weth.balanceOf.call(accounts[0]),
             await weth.balanceOf.call(accounts[1]),
@@ -362,12 +331,6 @@ contract("Swap", async accounts => {
 
 
     it("should give  3x leveraged loss to LETH holders when WETH price drops with system at a 1.5 coll ratio", async () => {
-        const swap = await Swap.deployed()
-        const weth = await MockWETH.deployed()
-        const eusd = await Token.at(contractAddrs.EUSD)
-        const leth = await Token.at(contractAddrs.LETH)
-        const prices = await MockRates.deployed()
-
         const wethBalsBefore = [
             await weth.balanceOf.call(accounts[0]),
             await weth.balanceOf.call(accounts[1]),
@@ -423,12 +386,6 @@ contract("Swap", async accounts => {
 
 
     it("should give  2x leveraged gain to LETH holders when WETH price rises with system at a 2.0 coll ratio", async () => {
-        const swap = await Swap.deployed()
-        const weth = await MockWETH.deployed()
-        const eusd = await Token.at(contractAddrs.EUSD)
-        const leth = await Token.at(contractAddrs.LETH)
-        const prices = await MockRates.deployed()
-
         const wethBalsBefore = [
             await weth.balanceOf.call(accounts[0]),
             await weth.balanceOf.call(accounts[1]),
@@ -486,12 +443,6 @@ contract("Swap", async accounts => {
 
 
     it("should give  3x leveraged gain to LETH holders when WETH price rises with system at a 1.5 coll ratio", async () => {
-        const swap = await Swap.deployed()
-        const weth = await MockWETH.deployed()
-        const eusd = await Token.at(contractAddrs.EUSD)
-        const leth = await Token.at(contractAddrs.LETH)
-        const prices = await MockRates.deployed()
-
         const wethBalsBefore = [
             await weth.balanceOf.call(accounts[0]),
             await weth.balanceOf.call(accounts[1]),
@@ -547,12 +498,6 @@ contract("Swap", async accounts => {
 
 
     it("should give 11x leveraged gain to LETH holders when WETH price rises with system at a 1.1 coll ratio", async () => {
-        const swap = await Swap.deployed()
-        const weth = await MockWETH.deployed()
-        const eusd = await Token.at(contractAddrs.EUSD)
-        const leth = await Token.at(contractAddrs.LETH)
-        const prices = await MockRates.deployed()
-
         const wethBalsBefore = [
             await weth.balanceOf.call(accounts[0]),
             await weth.balanceOf.call(accounts[1]),
@@ -610,13 +555,8 @@ contract("Swap", async accounts => {
 
 
     it("should revert if priority fee is greater than the maximum allowed", async () => {
-        const swap = await Swap.deployed()
-        const weth = await MockWETH.deployed()
-        const eusd = await Token.at(contractAddrs.EUSD)
-        const leth = await Token.at(contractAddrs.LETH)
-
         await weth.approve(swap.address, toWei(10))
-        
+
         try {
             await swap.buyHedge(toWei(10000), { maxPriorityFeePerGas: 4000000000 })
         } catch(e) {
@@ -625,12 +565,8 @@ contract("Swap", async accounts => {
         assert.fail();
     })
 
-    it("should not revert if priority fee is the maximum allowed", async () => {
-        const swap = await Swap.deployed()
-        const weth = await MockWETH.deployed()
-        const eusd = await Token.at(contractAddrs.EUSD)
-        const leth = await Token.at(contractAddrs.LETH)
 
+    it("should not revert if priority fee is the maximum allowed", async () => {
         await weth.approve(swap.address, toWei(10))
         await swap.buyHedge(toWei(10000), { maxPriorityFeePerGas: 3000000000 })
     })
