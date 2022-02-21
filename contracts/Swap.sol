@@ -5,6 +5,8 @@ import "./IToken.sol";
 
 /// @dev if collateralization ratio drops below 1, stablecoin holders can claim their share of the remaining collateral but the system needs to be redeployed.
 contract Swap {
+    uint constant ONE = 10**18;
+
     /// @notice minimum total value of leverage in underlying
     /// @dev prevents leverage `totalSupply` from growing too quickly and overflowing
     uint constant MIN_LEV_TOTAL_VALUE = 10**13;
@@ -13,12 +15,15 @@ contract Swap {
     IRates private rates;
 
     /// @notice The stablecoin. Value pegged to target asset
+    /// @dev Must use 18 decimals
     IToken private hedge;
 
     /// @notice The unstablecoin. Gives leveraged exposure to underlying asset.
+    /// @dev Must use 18 decimals
     IToken private leverage;
 
     /// @notice The token collateralizing hedge token / underlying leverage token
+    /// @dev Must use 18 decimals
     IToken private underlying;
 
     constructor(address _rates, address _hedge, address _leverage, address _underlying) {
@@ -29,7 +34,7 @@ contract Swap {
     }
 
     /// @notice limit TX priority to prevent fruntrunning price oracle updates
-    /// @notice Also should delay transaction to prevent trading on advanced price knowledge.
+    /// @notice Also should delay trades to prevent trading on advanced price knowledge.
     modifier limitedPriority {
         require(tx.gasprice - block.basefee <= rates.maxPriorityFee(), "Priority fee too high");
         _;
@@ -38,7 +43,7 @@ contract Swap {
     /// @notice Buy `amount` hedge tokens
     function buyHedge(uint amount) public limitedPriority {
         uint value = hedgeValue(amount);
-        require(value > 0, "zero value");
+        require(value > 0, "Zero value trade");
         underlying.transferFrom(msg.sender, address(this), value + rates.hedgeBuyPremium(value));
         hedge.mint(msg.sender, amount);
     }
@@ -46,7 +51,7 @@ contract Swap {
     /// @notice Sell `amount` hedge tokens
     function sellHedge(uint amount) public limitedPriority {
         uint value = hedgeValue(amount);
-        require(value > 0, "zero value");
+        require(value > 0, "Zero value trade");
         underlying.transfer(msg.sender, value - rates.hedgeSellPremium(value));
         hedge.burnFrom(msg.sender, amount);
     }
@@ -54,7 +59,7 @@ contract Swap {
     /// @notice Buy `amount` leverage tokens
     function buyLeverage(uint amount) public limitedPriority {
         uint value = leverageValue(amount);
-        require(value > 0, "zero value");
+        require(value > 0, "Zero value trade");
         underlying.transferFrom(msg.sender, address(this), value + rates.leverageBuyPremium(value));
         leverage.mint(msg.sender, amount);
     }
@@ -62,12 +67,12 @@ contract Swap {
     /// @notice Sell `amount` leverage tokens
     function sellLeverage(uint amount) public limitedPriority {
         uint value = leverageValue(amount);
-        require(value > 0, "zero value");
+        require(value > 0, "Zero value trade");
         underlying.transfer(msg.sender, value - rates.leverageSellPremium(value));
         leverage.burnFrom(msg.sender, amount);
     }
 
-    /// @notice Value of `amount` leverage tokens in underlying tokens
+    /// @return Value in underlying of `amount` leverage tokens
     /// @dev By passing in `amount` we can multiply before dividing, saving precision
     /// @dev Require minimum total value to prevent totalSupply overflow (still might be an issue idk)
     function leverageValue(uint amount) public view returns (uint) {
@@ -86,16 +91,16 @@ contract Swap {
     /// @return Value in underlying of `amount` hedge tokens
     function hedgeValue(uint amount) internal view returns (uint) {
         uint lastPrice = rates.target();
-        uint totalValue = hedge.totalSupply()*(10**18)/lastPrice;
+        uint totalValue = hedge.totalSupply()*ONE/lastPrice;
         uint balance = underlying.balanceOf(address(this));
         if (balance < totalValue)
             return amount*balance/hedge.totalSupply();
-        return amount*(10**18)/lastPrice;
+        return amount*ONE/lastPrice;
     }
 
     /// @return Value in underlying of all hedge tokens
     function hedgeTotalValue() internal view returns (uint) {
-        uint totalValue = hedge.totalSupply()*(10**18)/rates.target();
+        uint totalValue = hedge.totalSupply()*ONE/rates.target();
         uint balance = underlying.balanceOf(address(this));
         if (balance < totalValue)
             return balance;
