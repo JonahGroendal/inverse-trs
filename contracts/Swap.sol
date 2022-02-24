@@ -56,54 +56,69 @@ contract Swap {
         hedge.burnFrom(msg.sender, amount);
     }
 
-    /// @notice Buy `amount` leverage tokens
+    // @notice Buy `amount` leverage tokens
     function buyLeverage(uint amount) public limitedPriority {
-        uint value = leverageValue(amount);
+        uint hedgeTV    = hedgeTotalNomValue(rates.target());
+        uint leverageTV = leverageTotalValue(hedgeTV);
+        uint value      = leverageValue(amount, leverageTV);
         require(value > 0, "Zero value trade");
-        underlying.transferFrom(msg.sender, address(this), value + rates.leverageBuyPremium(value));
+        underlying.transferFrom(
+            msg.sender,
+            address(this),
+            value + rates.leverageBuyPremium(value, hedgeTV, leverageTV)
+        );
         leverage.mint(msg.sender, amount);
     }
 
     /// @notice Sell `amount` leverage tokens
     function sellLeverage(uint amount) public limitedPriority {
-        uint value = leverageValue(amount);
+        uint hedgeTV    = hedgeTotalNomValue(rates.target());
+        uint leverageTV = leverageTotalValue(hedgeTV);
+        uint value      = leverageValue(amount, leverageTV);
         require(value > 0, "Zero value trade");
-        underlying.transfer(msg.sender, value - rates.leverageSellPremium(value));
+        underlying.transfer(
+            msg.sender,
+            value - rates.leverageSellPremium(value, hedgeTV, leverageTV)
+        );
         leverage.burnFrom(msg.sender, amount);
     }
 
-    /// @return Value in underlying of `amount` leverage tokens
+    /// @return value Value in underlying of `amount` leverage tokens
     /// @dev By passing in `amount` we can multiply before dividing, saving precision
     /// @dev Require minimum total value to prevent totalSupply overflow (still might be an issue idk)
-    function leverageValue(uint amount) public view returns (uint) {
-        if (leverage.totalSupply() == 0)
+    function leverageValue(uint amount, uint totalValue) public view returns (uint) {
+        if (leverage.totalSupply() == 0) {
             return amount;
-        uint totalValue = leverageTotalValue();
-        require(totalValue > 10**15, "protecting against potential totalSupply overflow");
+        }
+        require(totalValue > MIN_LEV_TOTAL_VALUE, "Protecting against potential totalSupply overflow");
         return amount*totalValue/leverage.totalSupply();
     }
 
     /// @return Value in underlying of all leverage tokens
-    function leverageTotalValue() internal view returns (uint) {
-       return underlying.balanceOf(address(this)) - hedgeTotalValue(); 
+    function leverageTotalValue(uint _hedgeTotalNomValue) internal view returns (uint) {
+        uint _potValue = potValue();
+        if (_potValue > _hedgeTotalNomValue) {
+            return _potValue - _hedgeTotalNomValue;
+        }
+        return 0;
     }
 
     /// @return Value in underlying of `amount` hedge tokens
     function hedgeValue(uint amount) internal view returns (uint) {
-        uint lastPrice = rates.target();
-        uint totalValue = hedge.totalSupply()*ONE/lastPrice;
-        uint balance = underlying.balanceOf(address(this));
-        if (balance < totalValue)
-            return amount*balance/hedge.totalSupply();
-        return amount*ONE/lastPrice;
+        uint target = rates.target();
+        uint totalValue = hedgeTotalNomValue(lastPrice);
+        uint _potValue = potValue();
+        if (_potValue < totalValue)
+            return amount*_potValue/hedge.totalSupply();
+        return amount*ONE/target;
     }
 
-    /// @return Value in underlying of all hedge tokens
-    function hedgeTotalValue() internal view returns (uint) {
-        uint totalValue = hedge.totalSupply()*ONE/rates.target();
-        uint balance = underlying.balanceOf(address(this));
-        if (balance < totalValue)
-            return balance;
-        return totalValue;
+    /// @return Nominal value in underlying of all hedge tokens
+    function hedgeTotalNomValue(uint targetRate) internal view returns (uint) {
+        return hedge.totalSupply()*ONE/targetRate;
+    }
+
+    function potValue() internal view returns (uint) {
+        return underlying.balanceOf(address(this));
     }
 }
