@@ -1,7 +1,7 @@
 {
   "name": "volatility-swap",
   "version": "1.0.0",
-  "description": "Algorithmic ultra-stablecoin system with a market-determined collateralization ratio and a corresponding unstablecoin leveraged asset.",
+  "description": "Algorithmic stablecoin system with a market-determined collateralization ratio and a corresponding unstablecoin leveraged asset.",
   "main": "truffle-config.js",
   "directories": {
     "test": "test"
