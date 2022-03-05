@@ -1,54 +1,18 @@
 pragma solidity ^0.8.11;
 
-import "./IRates.sol";
+import "./Rates.sol";
 
-contract MockRates is IRates {
-    uint constant ONE = 10**18;
+contract MockRates is Rates {
 
-    uint private _target = 1000*(10**18);
+    uint internal _target = 1000*ONE;
 
-    /// @notice The amount `target` can deviate from the actual exchange rate without opening arbitrage opportunities
-    /// @dev Used to determine buy/sell premiums.
-    /// @dev A "float" with 18 decimals, representing a percentage
-    uint private _tolerance = 0;
-
-
+    /// @return Target hedge-underlying exchange rate, expressed as hedge per underlying.
     function target() public view override returns (uint) {
-        return _target;
-    }
-
-    function maxPriorityFee() public view override returns (uint) {
-        return 3000000000;
-    }
-
-
-    function hedgeBuyPremium(uint value) public view override returns (uint) {
-        return (value * ONE / (ONE - _tolerance)) - value;
-    }
-
-    function hedgeSellPremium(uint value) public view override returns (uint) {
-        return value - (value * ONE / (ONE + _tolerance));
-    }
-
-    function leverageBuyPremium(uint value, uint hedgeTotalValue, uint leverageTotalValue) public view override returns (uint) {
-        if (leverageTotalValue == 0) {
-            return 0;
-        }
-        return (value - (value * ONE / (ONE + _tolerance))) * hedgeTotalValue / leverageTotalValue;
-    }
-    
-    function leverageSellPremium(uint value, uint hedgeTotalValue, uint leverageTotalValue) public view override returns (uint) {
-        if (leverageTotalValue == 0) {
-            return 0;
-        }
-        return ((value * ONE / (ONE - _tolerance)) - value) * hedgeTotalValue / leverageTotalValue;
+        return _target * ONE_26 / denomPerHedge();
     }
 
     function setTarget(uint t) public {
         _target = t;
     }
 
-    function setTolerance(uint t) public {
-        _tolerance = t;
-    }
 }

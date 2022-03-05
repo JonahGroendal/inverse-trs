@@ -64,3 +64,10 @@ The VSSS is much simpler than MakerDAO, requiring no external services or auctio
 #### Single Collateral Type Per System
 DAI is collateralized with a mix of assets, including ETH, BAT, and USDC. Having a diverse porfolio of collateral assets mitigates risk of the system becoming undercollateralized.  
 Each VSSS is collateralized with only one asset, but multliple VSSSs will be deployed, each with its own collateral. This allows the trader a choice in the types and ratios of the collateral underlying their hedge. A blended stablecoin contract is planned to mix multiple VSSS stablecoins into one.
+
+# Known Attack Vectors
+## Frontrunning Price Oracle Updates
+To prevent this, the Swap contract enforces a maximum allowed priority fee on all buy or sell transactions. This prevents an attacker from getting a transaction in front of a price oracle update transaction after it's already in the mempool.
+
+## Soft Frontrunning
+It's possible for an attacker to predict a price orace update before the transaction even enters the mempool by looking at off-chain data such as prices on centralized exchanges. There are two lines of defence agains this. First, 

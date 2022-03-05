@@ -36,6 +36,7 @@
     "truffle": "^5.5.0"
   },
   "devDependencies": {
-    "eth-gas-reporter": "^0.2.24"
+    "eth-gas-reporter": "^0.2.24",
+    "openzeppelin-test-helpers": "^0.5.1"
   }
 }

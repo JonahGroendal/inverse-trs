@@ -9,7 +9,7 @@ contract Swap {
 
     /// @notice minimum total value of leverage in underlying
     /// @dev prevents leverage `totalSupply` from growing too quickly and overflowing
-    uint constant MIN_LEV_TOTAL_VALUE = 10**13;
+    uint constant MIN_LEV_TV = 10**13;
 
     /// @notice Provides price of underlying in target asset
     IRates private rates;
@@ -90,7 +90,7 @@ contract Swap {
         if (leverage.totalSupply() == 0) {
             return amount;
         }
-        require(totalValue > MIN_LEV_TOTAL_VALUE, "Protecting against potential totalSupply overflow");
+        require(totalValue > MIN_LEV_TV, "Protecting against potential totalSupply overflow");
         return amount*totalValue/leverage.totalSupply();
     }
 
@@ -106,7 +106,7 @@ contract Swap {
     /// @return Value in underlying of `amount` hedge tokens
     function hedgeValue(uint amount) internal view returns (uint) {
         uint target = rates.target();
-        uint totalValue = hedgeTotalNomValue(lastPrice);
+        uint totalValue = hedgeTotalNomValue(target);
         uint _potValue = potValue();
         if (_potValue < totalValue)
             return amount*_potValue/hedge.totalSupply();

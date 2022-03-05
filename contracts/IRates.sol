@@ -1,8 +1,12 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 interface IRates {
-    /// @notice Gets target price of hedge tokens in underlying from a price feed
+    /// @notice Gets target exchange rate of hedge from a price feed. Expressed as hedge per underlying
     function target() external view returns (uint);
+
+    /// @notice Value of hedge in denominating currency. Changes based on the interest rate
+    /// @return Target currency-hedge exchange rate, expressed as denominating currency per hedge
+    function denomPerHedge() external view returns (uint);
 
     /// @notice Maximum allowed priority fee for trades
     /// @dev Prevents fruntrunning price oracle
