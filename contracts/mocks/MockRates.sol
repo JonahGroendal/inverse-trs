@@ -1,6 +1,6 @@
 pragma solidity ^0.8.11;
 
-import "./Rates.sol";
+import "../Rates.sol";
 
 contract MockRates is Rates {
 

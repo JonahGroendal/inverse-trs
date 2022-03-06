@@ -1,6 +1,6 @@
 pragma solidity ^0.8.11;
 
-import "./MathUtils.sol";
+import "../MathUtils.sol";
 
 contract MockMath {
     using MathUtils for uint;

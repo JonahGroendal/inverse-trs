@@ -9,7 +9,7 @@ contract Swap {
 
     /// @notice minimum total value of floatLeg in underlying
     /// @dev prevents floatLeg `totalSupply` from growing too quickly and overflowing
-    uint constant MIN_LEV_TV = 10**13;
+    uint constant MIN_FLOAT_TV = 10**13;
 
     /// @notice Provides price of underlying in target asset
     IRates private rates;
@@ -97,7 +97,7 @@ contract Swap {
         if (floatLeg.totalSupply() == 0) {
             return amount;
         }
-        require(totalValue > MIN_LEV_TV, "Protecting against potential totalSupply overflow");
+        require(totalValue > MIN_FLOAT_TV, "Protecting against potential totalSupply overflow");
         return amount*totalValue/floatLeg.totalSupply();
     }
 
