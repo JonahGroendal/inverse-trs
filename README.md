@@ -1,7 +1,9 @@
 # Volatility Swap Stablecoin System
 VSSS has two product offerings, a stablecoin and an unstable (i.e. leveraged) coin.  
   
-Both tokens are collateralized with the same underlying asset. The stablecoin maintains a peg to a target asset, for example USD, via a price feed. Conversely, the unstablecoin offeres leveraged exposure to the underlying asset. It's essentially an equity swap contract with tokenized fixed and floating legs.
+Both tokens are collateralized with the same underlying asset. The stablecoin maintains a peg to a target asset, for example USD, via a price feed. Conversely, the unstablecoin offeres leveraged exposure to the underlying asset.
+
+Essentially, it's an equity swap contract with tokenized fixed and floating legs, with payments and collateral in the reference asset.
 
 ## Properties of the system
 L = leverage of the unstable (i.e. leveraged) coin  
