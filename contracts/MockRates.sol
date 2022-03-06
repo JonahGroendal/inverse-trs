@@ -8,7 +8,7 @@ contract MockRates is Rates {
 
     /// @return Target hedge-underlying exchange rate, expressed as hedge per underlying.
     function target() public view override returns (uint) {
-        return _target * ONE_26 / denomPerHedge();
+        return _target * ONE_26 / denomPerFixed();
     }
 
     function setTarget(uint t) public {

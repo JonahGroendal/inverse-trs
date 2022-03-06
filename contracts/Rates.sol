@@ -22,12 +22,12 @@ abstract contract Rates is IRates {
     uint internal startTime = block.timestamp;
     uint internal startValue = ONE_26;
 
-    /// @return Target hedge-underlying exchange rate, expressed as hedge per underlying.
+    /// @return Target fixed-underlying exchange rate, expressed as fixed per underlying.
     function target() public view virtual returns (uint);
 
-    /// @notice Value of hedge in denominating currency. Changes based on the interest rate
-    /// @return Target currency-hedge exchange rate, expressed as denominating currency per hedge. 26-decimal fixed-point 
-    function denomPerHedge() public view override returns (uint) {
+    /// @notice Value of fixed in denominating currency. Changes based on the interest rate
+    /// @return Target currency-fixed exchange rate, expressed as denominating currency per fixed. 26-decimal fixed-point 
+    function denomPerFixed() public view override returns (uint) {
         unchecked {
             return startValue * (interest*100000000).pow((block.timestamp - startTime) / COMPOUNDING_PERIOD) / ONE_26;
         }
@@ -38,26 +38,26 @@ abstract contract Rates is IRates {
     }
 
 
-    function hedgeBuyPremium(uint value) public view override returns (uint) {
+    function fixedBuyPremium(uint value) public view override returns (uint) {
         return (value * ONE / (ONE - tolerance)) - value;
     }
 
-    function hedgeSellPremium(uint value) public view override returns (uint) {
+    function fixedSellPremium(uint value) public view override returns (uint) {
         return value - (value * ONE / (ONE + tolerance));
     }
 
-    function leverageBuyPremium(uint value, uint hedgeTotalValue, uint leverageTotalValue) public view override returns (uint) {
-        if (leverageTotalValue == 0) {
+    function floatBuyPremium(uint value, uint fixedTotalValue, uint floatTotalValue) public view override returns (uint) {
+        if (floatTotalValue == 0) {
             return 0;
         }
-        return (value - (value * ONE / (ONE + tolerance))) * hedgeTotalValue / leverageTotalValue;
+        return (value - (value * ONE / (ONE + tolerance))) * fixedTotalValue / floatTotalValue;
     }
 
-    function leverageSellPremium(uint value, uint hedgeTotalValue, uint leverageTotalValue) public view override returns (uint) {
-        if (leverageTotalValue == 0) {
+    function floatSellPremium(uint value, uint fixedTotalValue, uint floatTotalValue) public view override returns (uint) {
+        if (floatTotalValue == 0) {
             return 0;
         }
-        return ((value * ONE / (ONE - tolerance)) - value) * hedgeTotalValue / leverageTotalValue;
+        return ((value * ONE / (ONE - tolerance)) - value) * fixedTotalValue / floatTotalValue;
     }
 
     function setTolerance(uint _tolerance) public {
@@ -68,7 +68,7 @@ abstract contract Rates is IRates {
     /// @param _interest 18-decimal fixed-point. 1 + hourly interest rate.
     // TODO: restrict access
     function setInterest(uint _interest) public {
-        startValue = denomPerHedge();
+        startValue = denomPerFixed();
         startTime = startTime + (((block.timestamp - startTime) / COMPOUNDING_PERIOD) * COMPOUNDING_PERIOD);
         interest = _interest;
     }

@@ -1,35 +1,36 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 interface IRates {
-    /// @notice Gets target exchange rate of hedge from a price feed. Expressed as hedge per underlying
+    /// @notice The target fixed-underlying exchange rate.
+    /// @notice Gets exchange rate of underlying from a price feed. Expressed as fixed per underlying
     function target() external view returns (uint);
 
-    /// @notice Value of hedge in denominating currency. Changes based on the interest rate
-    /// @return Target currency-hedge exchange rate, expressed as denominating currency per hedge
-    function denomPerHedge() external view returns (uint);
+    /// @notice Value of fixed in denominating currency. Changes based on the interest rate
+    /// @return Target currency-fixed exchange rate, expressed as denominating currency per fixed
+    function denomPerFixed() external view returns (uint);
 
     /// @notice Maximum allowed priority fee for trades
     /// @dev Prevents fruntrunning price oracle
     function maxPriorityFee() external view returns (uint);
 
 
-    /// @return Fee required to buy `amount` hedge tokens
+    /// @return Fee required to buy `amount` fixed tokens
     /// @param value Value of trade in underlying
-    function hedgeBuyPremium(uint value) external view returns (uint);
+    function fixedBuyPremium(uint value) external view returns (uint);
 
-    /// @return Fee required to sell `amount` hedge tokens
+    /// @return Fee required to sell `amount` fixed tokens
     /// @param value Value of trade in underlying
-    function hedgeSellPremium(uint value) external view returns (uint);
+    function fixedSellPremium(uint value) external view returns (uint);
 
-    /// @return Fee required to buy `amount` leverage tokens
+    /// @return Fee required to buy `amount` float tokens
     /// @param value Value of trade in underlying
-    /// @param hedgeTotalValue Value in underlying of all hedge tokens
-    /// @param leverageTotalValue Value in underlying of all leverage tokens
-    function leverageBuyPremium(uint value, uint hedgeTotalValue, uint leverageTotalValue) external view returns (uint);
+    /// @param fixedTotalValue Value in underlying of all fixed tokens
+    /// @param floatTotalValue Value in underlying of all float tokens
+    function floatBuyPremium(uint value, uint fixedTotalValue, uint floatTotalValue) external view returns (uint);
 
-    /// @return Fee required to sell `amount` leverage tokens
+    /// @return Fee required to sell `amount` float tokens
     /// @param value Value of trade in underlying
-    /// @param hedgeTotalValue Value in underlying of all hedge tokens
-    /// @param leverageTotalValue Value in underlying of all leverage tokens
-    function leverageSellPremium(uint value, uint hedgeTotalValue, uint leverageTotalValue) external view returns (uint);
+    /// @param fixedTotalValue Value in underlying of all fixed tokens
+    /// @param floatTotalValue Value in underlying of all float tokens
+    function floatSellPremium(uint value, uint fixedTotalValue, uint floatTotalValue) external view returns (uint);
 }
