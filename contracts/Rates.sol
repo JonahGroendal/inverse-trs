@@ -35,7 +35,7 @@ abstract contract Rates is IRates {
         return underlying() * ONE_26 / accIntMul();
     }
 
-    /// @return Value of underlying token in denominating currency. 
+    /// @return Value of underlying in denominating currency. 
     /// @dev Gets exchange rate from a price feed.
     function underlying() internal view virtual returns (uint);
 
