@@ -3,9 +3,8 @@ pragma solidity ^0.8.11;
 library MathUtils {
     uint constant ONE_26 = 10**26;
 
-    // May not be precise enough. Try more decimals?
     /// @notice Calculate `base`^`n`
-    /// @param base Fixed-point number with 18 decimals
+    /// @param base Fixed-point number with 26 decimals
     /// @param n Integer exponent
     function pow(uint base, uint n) internal pure returns (uint) {
         if (n == 0)
