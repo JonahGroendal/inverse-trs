@@ -7,22 +7,24 @@ import "./IToken.sol";
 contract Swap {
     uint constant ONE = 10**18;
 
-    /// @notice minimum total value of floatLeg in underlying
+    /// @notice Minimum allowed value of floatLeg in underlying
     /// @dev prevents floatLeg `totalSupply` from growing too quickly and overflowing
     uint constant MIN_FLOAT_TV = 10**13;
 
     /// @notice Provides price of underlying in target asset
     IRates private rates;
 
-    /// @notice The stablecoin. Value pegged to target asset
+    /// @notice Tokens comprising the swap's fixed leg
+    /// @notice Pegged to denominating asset + accrewed interest
     /// @dev Must use 18 decimals
     IToken private fixedLeg;
 
-    /// @notice The unstablecoin. Gives leveraged exposure to underlying asset.
+    /// @notice Tokens comprising the swap's floating leg
+    /// @notice Pegged to [R/(R-1)]x leveraged underlying
     /// @dev Must use 18 decimals
     IToken private floatLeg;
 
-    /// @notice The token collateralizing fixedLeg token / underlying floatLeg token
+    /// @notice Token collateralizing fixedLeg / underlying floatLeg
     /// @dev Must use 18 decimals
     IToken private underlying;
 
@@ -40,7 +42,7 @@ contract Swap {
         _;
     }
 
-    /// @notice Buy `amount` fixedLeg tokens
+    /// @notice Buy into fixed leg, minting `amount` tokens
     function buyFixed(uint amount) public limitedPriority {
         uint value = fixedValue(amount);
         require(value > 0, "Zero value trade");
@@ -52,7 +54,7 @@ contract Swap {
         fixedLeg.mint(msg.sender, amount);
     }
 
-    /// @notice Sell `amount` fixedLeg tokens
+    /// @notice Sell out of fixed leg, burning `amount` tokens
     function sellFixed(uint amount) public limitedPriority {
         uint value = fixedValue(amount);
         require(value > 0, "Zero value trade");
@@ -63,7 +65,7 @@ contract Swap {
         fixedLeg.burnFrom(msg.sender, amount);
     }
 
-    // @notice Buy `amount` floatLeg tokens
+    /// @notice Buy into floating leg, minting `amount` tokens
     function buyFloat(uint amount) public limitedPriority {
         uint fixedTV = fixedTotalNomValue(rates.target());
         uint floatTV = floatTotalValue(fixedTV);
@@ -77,7 +79,7 @@ contract Swap {
         floatLeg.mint(msg.sender, amount);
     }
 
-    /// @notice Sell `amount` floatLeg tokens
+    /// @notice Sell out of floating leg, burning `amount` tokens
     function sellFloat(uint amount) public limitedPriority {
         uint fixedTV = fixedTotalNomValue(rates.target());
         uint floatTV = floatTotalValue(fixedTV);
@@ -90,9 +92,9 @@ contract Swap {
         floatLeg.burnFrom(msg.sender, amount);
     }
 
-    /// @return value Value in underlying of `amount` floatLeg tokens
+    /// @return Value in underlying of `amount` floatLeg tokens
     /// @dev By passing in `amount` we can multiply before dividing, saving precision
-    /// @dev Require minimum total value to prevent totalSupply overflow (still might be an issue idk)
+    /// @dev Require minimum total value to prevent totalSupply overflow
     function floatValue(uint amount, uint totalValue) public view returns (uint) {
         if (floatLeg.totalSupply() == 0) {
             return amount;
