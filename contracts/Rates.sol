@@ -14,7 +14,7 @@ abstract contract Rates is IRates {
     /// @dev Prevents fruntrunning price oracle
     uint public maxPriorityFee = 3000000000;
 
-    /// @notice The amount `target` can safely deviate from the actual exchange rate due to latency
+    /// @notice Amount the price feed can safely deviate from the actual exchange rate due to latency
     /// @dev Used to calculate buy/sell premiums.
     /// @dev 18-decimal fixed-point percentage
     uint internal tolerance;
@@ -29,11 +29,17 @@ abstract contract Rates is IRates {
     /// @notice Value of accumulated interest multiplier when interest began accrewing
     uint internal startValue = ONE_26;
 
-    /// @return The target value of 1 fixedLeg token in underlying. 
-    /// @dev Gets exchange rate from a price feed.
-    function target() public view virtual returns (uint);
+    /// @return Nominal value of 1 fixedLeg token in underlying
+    /// @dev underlying exchange rate + accrewed interest
+    function fixedValue() public view virtual returns (uint) {
+        return underlying() * ONE_26 / accIntMul();
+    }
 
-    /// @notice Accrewed interest multiplier. Value of 1 fixedLeg token in denominating currency.
+    /// @return Value of underlying token in denominating currency. 
+    /// @dev Gets exchange rate from a price feed.
+    function underlying() internal view virtual returns (uint);
+
+    /// @notice Accrewed interest multiplier. Nominal value of 1 fixedLeg token in denominating currency
     /// @return Target currency-fixed exchange rate, expressed as denominating currency per fixed. 26-decimal fixed-point 
     function accIntMul() public view override returns (uint) {
         unchecked {

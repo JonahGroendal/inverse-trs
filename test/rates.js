@@ -31,7 +31,7 @@ contract("Rates", accounts => {
 
     it("should correctly calculate fixed value at the current interest rate", async () => {
         await rates.setTarget(toWei(1000));
-        const rate = await rates.target.call();
+        const rate = await rates.fixedValue.call();
         const multiplier = await rates.accIntMul.call()
         const expected = toWei(1000).mul((new BN(10)).pow(new BN(26))).div(multiplier)
 

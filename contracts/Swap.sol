@@ -11,7 +11,7 @@ contract Swap {
     /// @dev prevents floatLeg `totalSupply` from growing too quickly and overflowing
     uint constant MIN_FLOAT_TV = 10**13;
 
-    /// @notice Provides price of underlying in target asset
+    /// @notice Tracks exchange rates, accrewed interest, and premiums
     IRates private rates;
 
     /// @notice Tokens comprising the swap's fixed leg
@@ -67,7 +67,7 @@ contract Swap {
 
     /// @notice Buy into floating leg, minting `amount` tokens
     function buyFloat(uint amount) public limitedPriority {
-        uint fixedTV = fixedTotalNomValue(rates.target());
+        uint fixedTV = fixedTotalNomValue(rates.fixedValue());
         uint floatTV = floatTotalValue(fixedTV);
         uint value   = floatValue(amount, floatTV);
         require(value > 0, "Zero value trade");
@@ -81,7 +81,7 @@ contract Swap {
 
     /// @notice Sell out of floating leg, burning `amount` tokens
     function sellFloat(uint amount) public limitedPriority {
-        uint fixedTV = fixedTotalNomValue(rates.target());
+        uint fixedTV = fixedTotalNomValue(rates.fixedValue());
         uint floatTV = floatTotalValue(fixedTV);
         uint value   = floatValue(amount, floatTV);
         require(value > 0, "Zero value trade");
@@ -114,17 +114,18 @@ contract Swap {
 
     /// @return Value in underlying of `amount` fixedLeg tokens
     function fixedValue(uint amount) internal view returns (uint) {
-        uint target = rates.target();
-        uint totalValue = fixedTotalNomValue(target);
+        uint value = rates.fixedValue();
+        uint totalValue = fixedTotalNomValue(value);
         uint _potValue = potValue();
         if (_potValue < totalValue)
             return amount*_potValue/fixedLeg.totalSupply();
-        return amount*ONE/target;
+        return amount*ONE/value;
     }
 
     /// @return Nominal value in underlying of all fixedLeg tokens
-    function fixedTotalNomValue(uint targetRate) internal view returns (uint) {
-        return fixedLeg.totalSupply()*ONE/targetRate;
+    /// @param value Nominal value in underlying of 1 fixedLeg token
+    function fixedTotalNomValue(uint value) internal view returns (uint) {
+        return fixedLeg.totalSupply()*ONE/value;
     }
 
     function potValue() internal view returns (uint) {
