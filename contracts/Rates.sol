@@ -30,12 +30,16 @@ abstract contract Rates is IRates {
     uint internal startValue = ONE_26;
 
     /// @return Nominal value of 1 underlying token in fixedLeg
+<<<<<<< Updated upstream
+=======
+    /// @param multiplier The target value multiplier. 18-decimal fixed-point
+>>>>>>> Stashed changes
     /// @dev underlying exchange rate + accrewed interest
-    function fixedValue() public view virtual returns (uint) {
-        return underlying() * ONE_26 / accIntMul();
+    function fixedValue(uint multiplier) public view virtual returns (uint) {
+        return underlying() * multiplier * 100000000 / accIntMul();
     }
 
-    /// @return Value of underlying in denominating currency. 
+    /// @return Value of underlying in denominating currency.
     /// @dev Gets exchange rate from a price feed.
     function underlying() internal view virtual returns (uint);
 

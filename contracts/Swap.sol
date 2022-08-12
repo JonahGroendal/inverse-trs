@@ -3,7 +3,8 @@ pragma solidity ^0.8.11;
 import "./IRates.sol";
 import "./IToken.sol";
 
-/// @dev if collateralization ratio drops below 1, stablecoin holders can claim their share of the remaining collateral but the system needs to be redeployed.
+/// @notice The swap contract
+/// @notice Mints/burns fixed/floating leg tokens and holds on to the collateral
 contract Swap {
     uint constant ONE = 10**18;
 
@@ -11,7 +12,9 @@ contract Swap {
     /// @dev prevents floatLeg `totalSupply` from growing too quickly and overflowing
     uint constant MIN_FLOAT_TV = 10**13;
 
-    /// @notice Tracks exchange rates, accrewed interest, and premiums
+    uint public targetMul;
+
+    /// @notice Tracks exchange rates, accrewed interest, premiums
     IRates private rates;
 
     /// @notice Tokens comprising the swap's fixed leg
@@ -33,6 +36,7 @@ contract Swap {
         fixedLeg   = IToken(_fixedLeg);
         floatLeg   = IToken(_floatLeg);
         underlying = IToken(_underlying);
+        targetMul  = ONE;
     }
 
     /// @notice limit TX priority to prevent fruntrunning price oracle updates
@@ -44,6 +48,7 @@ contract Swap {
 
     /// @notice Buy into fixed leg, minting `amount` tokens
     function buyFixed(uint amount) public limitedPriority {
+        checkSolvency();
         uint value = fixedValue(amount);
         require(value > 0, "Zero value trade");
         underlying.transferFrom(
@@ -56,6 +61,7 @@ contract Swap {
 
     /// @notice Sell out of fixed leg, burning `amount` tokens
     function sellFixed(uint amount) public limitedPriority {
+        checkSolvency();
         uint value = fixedValue(amount);
         require(value > 0, "Zero value trade");
         underlying.transfer(
@@ -67,7 +73,8 @@ contract Swap {
 
     /// @notice Buy into floating leg, minting `amount` tokens
     function buyFloat(uint amount) public limitedPriority {
-        uint fixedTV = fixedTotalNomValue(rates.fixedValue());
+        checkSolvency();
+        uint fixedTV = fixedTotalNomValue(rates.fixedValue(targetMul));
         uint floatTV = floatTotalValue(fixedTV);
         uint value   = floatValue(amount, floatTV);
         require(value > 0, "Zero value trade");
@@ -81,10 +88,13 @@ contract Swap {
 
     /// @notice Sell out of floating leg, burning `amount` tokens
     function sellFloat(uint amount) public limitedPriority {
-        uint fixedTV = fixedTotalNomValue(rates.fixedValue());
+        checkSolvency();
+        uint fixedTV = fixedTotalNomValue(rates.fixedValue(targetMul));
         uint floatTV = floatTotalValue(fixedTV);
         uint value   = floatValue(amount, floatTV);
         require(value > 0, "Zero value trade");
+        //require(floatTV - value >= MIN_FLOAT_TV, "Insufficient collateral");
+        require(floatTV >= value, "Insufficient collateral");
         underlying.transfer(
             msg.sender,
             value - rates.floatSellPremium(value, fixedTV, floatTV)
@@ -92,15 +102,38 @@ contract Swap {
         floatLeg.burnFrom(msg.sender, amount);
     }
 
+    function checkSolvency() public {
+        uint assets = potValue();
+        uint liabilities = fixedTotalNomValue(rates.fixedValue(targetMul));
+        //require(assets > MIN_FLOAT_TV);
+        // if (assets < MIN_FLOAT_TV) {
+        //     // in case somebody sends some underlying to this contract
+        //     uint floatSupply = floatLeg.totalSupply();
+        //     if (floatSupply < assets) {
+        //         floatLeg.mint(address(0), assets - floatSupply);
+        //     }
+        // }
+        /*else */if (assets < liabilities/* + MIN_FLOAT_TV*/) {
+            settleDebt();
+        }
+    }
+
+    function settleDebt() internal {
+        targetMul = (fixedLeg.totalSupply() * ONE / (potValue()/* - (MIN_FLOAT_TV)*/)) * ONE / rates.fixedValue(ONE);
+    }
+
     /// @return Value in underlying of `amount` floatLeg tokens
     /// @dev By passing in `amount` we can multiply before dividing, saving precision
     /// @dev Require minimum total value to prevent totalSupply overflow
+    /// @dev cant be public because some parameter valuse cause debt settlement
     function floatValue(uint amount, uint totalValue) public view returns (uint) {
-        if (floatLeg.totalSupply() == 0) {
-            return amount;
-        }
-        require(totalValue > MIN_FLOAT_TV, "Protecting against potential totalSupply overflow");
-        return amount*totalValue/floatLeg.totalSupply();
+        //if (floatLeg.totalSupply() == 0) {
+        //    return amount;
+        //}
+        //require(totalValue > MIN_FLOAT_TV, "Protecting against potential totalSupply overflow");
+
+        // add ONE to numerator and denominator to prevent float supply from growing too quickly
+        return amount*(totalValue + ONE)/(floatLeg.totalSupply() + ONE);
     }
 
     /// @return Value in underlying of all floatLeg tokens
@@ -114,11 +147,12 @@ contract Swap {
 
     /// @return Value in underlying of `amount` fixedLeg tokens
     function fixedValue(uint amount) internal view returns (uint) {
-        uint value = rates.fixedValue();
-        uint totalValue = fixedTotalNomValue(value);
-        uint _potValue = potValue();
-        if (_potValue < totalValue)
-            return amount*_potValue/fixedLeg.totalSupply();
+        uint value = rates.fixedValue(targetMul);
+        // not neccesary because checkSolvency() is called beforehand
+        //uint totalValue = fixedTotalNomValue(value);
+        //uint _potValue = potValue();
+        //if (_potValue < totalValue)
+        //    return amount*_potValue/fixedLeg.totalSupply();
         return amount*ONE/value;
     }
 
