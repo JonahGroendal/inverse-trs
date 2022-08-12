@@ -88,7 +88,7 @@ The VSSS is much simpler than MakerDAO, requiring no external services or auctio
 
 #### Single Collateral Type Per System
 DAI is collateralized with a mix of assets, including ETH, BAT, and USDC. Having a diverse porfolio of collateral assets mitigates risk of the system becoming undercollateralized.  
-Each VSSS is collateralized with only one asset, but multliple VSSSs will be deployed, each with its own collateral. This allows the trader a choice in the types and ratios of the collateral underlying their hedge. A blended stablecoin contract is planned to mix multiple VSSS stablecoins into one.
+Each VSSS is collateralized with only one asset, but multliple VSSSs will be deployed, each with its own collateral. This allows the trader a choice in the types and ratios of the collateral underlying their hedge. Alternatively, a blended collateral contract is planned to mix multiple collateral types into one, allowing for a multi-collateral stablecoin.
 
 # Possible Attack Vectors
 ## Frontrunning
@@ -102,7 +102,14 @@ In theory it's possible for an attacker to predict a price orace update before t
 
 
 # Composability (Derivatives legos)
-Use synthetic assets as the underlying asset for other swap contracts. i.e. collateralize synthetic assets with other synthetic assets. The token outputs from one swap contract can be used as inputs to others.
+Use synthetic assets as the underlying asset for other swap contracts. i.e. collateralize synthetic assets with other synthetic assets. The token outputs from one swap contract can be used as inputs to others.    
+
+Is it a bad idea?     
+  - It isn't necessary since a single contract can track any asset or index and use any ERC20 as collateral
+  - adds friction (time and gas costs) to entering/exiting positions
+  - undercollateralization of dependant contracts adds complications
+  - creates redundant synthetic tokens e.g. sUSD/ETH's resulting sETH
+    - you can just hold ETH, or have the cashflow equivalent of sETH by holding lETH and ETH/hETH's hETH
 
 ## Shorting
 E.g. use the sUSD created from the ETH/USD swap to create an sUSD/ETH swap
@@ -136,12 +143,17 @@ Open question: what's the value of the floating-leg tokens?
   - essentially they're "out of the money" but not worthless
   - They're worthless iff all fixed-leg holders burn their tokens and redeem the collateral
     - Are fixed-leg holders incentivized to do so?
+      - is the value of the collaeral > the value of the token?
+        - yes: has the same downside potential with less upside potential
 
 ## Alternative behaviors
 ### Graceful default
+- mostly implemented on another branch but decided against going this way
+
 Ratchet down the target value of fixed-leg tokens when the price drops such that the collateralization ratio can never be < 1
 pros:
   - Prevents having to redeploy the swap if it becomes undercollateralized, which also prevents having to redeploy any derivative swaps
+   - derivative swaps are not necessary, most likey a bad idea
   - Penalizes fixed-leg holders for letting the swap become undercollateralized, helping prevent it from ever happening
   - Further incentivizes buying into floating-leg as collateralization approaches 1
 cons:
@@ -149,7 +161,7 @@ cons:
   - Fixed-leg would demand a higher interest rate, which isn't necessarily bad, possibly good as it acts as an automatic stabilizer
 could be the way to go.
   - more catastrophic for fixed-leg holders if there's a default. BUT less so for floating-leg holders
-  - 
+  - more code when we could just redeploy. It's never supposed to happen anyway
 
 
 # TODO
@@ -162,6 +174,7 @@ could be the way to go.
 - improve method names of Rates contract
 - look into being erc-4626 compatible.
   - There doesn't seem to be a good way of doing it where both tokens are supported by the standard
+- make tokens vote-able. Let token holders vote on interest rate/fees in the future.
 
 # Similar projects
 - USM: https://jacob-eliosoff.medium.com/whats-the-simplest-possible-decentralized-stablecoin-4a25262cf5e8
