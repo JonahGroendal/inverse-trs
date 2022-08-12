@@ -29,7 +29,7 @@ abstract contract Rates is IRates {
     /// @notice Value of accumulated interest multiplier when interest began accrewing
     uint internal startValue = ONE_26;
 
-    /// @return Nominal value of 1 fixedLeg token in underlying
+    /// @return Nominal value of 1 underlying token in fixedLeg
     /// @dev underlying exchange rate + accrewed interest
     function fixedValue() public view virtual returns (uint) {
         return underlying() * ONE_26 / accIntMul();
