@@ -575,7 +575,7 @@ contract("Swap", accounts => {
     })
 
 
-    it("LETH buy premium @ 1% target tolerance should equal gains from holding through a 1% increase in target price", async () => {
+    it("LETH buy  premium @ 1% target tolerance should equal gains from holding through a 1% increase in target price", async () => {
         // set up contract state
         await prices.setTarget(toWei(1000))
         await prices.setTolerance(toWei(0))
@@ -652,7 +652,7 @@ contract("Swap", accounts => {
     })
 
 
-    it("EUSD buy premium @ 1% target tolerance should equal gains from holding through a 1% decrease in target price", async () => {
+    it("EUSD buy  premium @ 1% target tolerance should equal gains from holding through a 1% decrease in target price", async () => {
         // set up contract state
         await prices.setTarget(toWei(1000))
         await prices.setTolerance(toWei(0))
