@@ -5,7 +5,8 @@ const BN = web3.utils.BN
 const Swap = artifacts.require("Swap")
 const MockWETH = artifacts.require("MockWETH")
 const Token = artifacts.require("Token")
-const MockRates = artifacts.require("MockRates")
+const MockPriceFeed = artifacts.require("MockPriceFeed");
+const Rates = artifacts.require("Rates")
 
 const toWei = amount => (new BN(amount*10000000000)).mul((new BN(10)).pow(new BN(8)))
 
@@ -14,14 +15,15 @@ contract("Swap", accounts => {
     let weth;
     let eusd;
     let leth;
-    let prices;
+    let rates;
 
     beforeEach(async () => {
         swap = await Swap.deployed()
         weth = await MockWETH.deployed()
         eusd = await Token.at(contractAddrs.EUSD)
         leth = await Token.at(contractAddrs.LETH)
-        prices = await MockRates.deployed()
+        rates = await Rates.deployed()
+        feed = await MockPriceFeed.deployed();
     })
 
 
@@ -120,7 +122,7 @@ contract("Swap", accounts => {
             await weth.balanceOf.call(accounts[2])
         ]
 
-        await prices.setTarget(toWei(5))
+        await feed.setPrice(toWei(5))
         await eusd.approve(swap.address, toWei( 2077), { from: accounts[0] })
         await eusd.approve(swap.address, toWei(10101), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(  304), { from: accounts[2] })
@@ -158,7 +160,7 @@ contract("Swap", accounts => {
         await weth.transfer(swap.address, toWei(1), { from: accounts[3] }) // get contract out of stuck state due to overflow protection
         await leth.approve(swap.address, toWei(11), { from: accounts[3] })
         await swap.sellFloat(toWei(11), { from: accounts[3] })          // reset balances to 0
-        await prices.setTarget(toWei(1000))
+        await feed.setPrice(toWei(1000))
     })
 
 
@@ -183,7 +185,7 @@ contract("Swap", accounts => {
             await weth.balanceOf.call(accounts[2])
         ]
 
-        await prices.setTarget(toWei(777))
+        await feed.setPrice(toWei(777))
         await eusd.approve(swap.address, toWei( 2077), { from: accounts[0] })
         await eusd.approve(swap.address, toWei(10101), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(  304), { from: accounts[2] })
@@ -218,7 +220,7 @@ contract("Swap", accounts => {
 
 
     it("should maintian peg if WETH price rises", async () => {
-        await prices.setTarget(toWei(1000))
+        await feed.setPrice(toWei(1000))
         await weth.approve(swap.address, toWei( 2.077), { from: accounts[0] })
         await weth.approve(swap.address, toWei(10.101), { from: accounts[1] })
         await weth.approve(swap.address, toWei(  .304), { from: accounts[2] })
@@ -239,7 +241,7 @@ contract("Swap", accounts => {
             await weth.balanceOf.call(accounts[2])
         ]
 
-        await prices.setTarget(toWei(1400))
+        await feed.setPrice(toWei(1400))
         await eusd.approve(swap.address, toWei( 2077), { from: accounts[0] })
         await eusd.approve(swap.address, toWei(10101), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(  304), { from: accounts[2] })
@@ -279,7 +281,7 @@ contract("Swap", accounts => {
             await weth.balanceOf.call(accounts[1]),
         ]
 
-        await prices.setTarget(toWei(1000))
+        await feed.setPrice(toWei(1000))
         await weth.approve(swap.address, toWei(25), { from: accounts[0] })
         await weth.approve(swap.address, toWei(75), { from: accounts[1] })
         await weth.approve(swap.address, toWei(15), { from: accounts[2] })
@@ -294,7 +296,7 @@ contract("Swap", accounts => {
             await weth.balanceOf.call(accounts[1])
         ]
 
-        await prices.setTarget(toWei(600))
+        await feed.setPrice(toWei(600))
         await leth.approve(swap.address, toWei(   25), { from: accounts[0] })
         await leth.approve(swap.address, toWei(   75), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(15000), { from: accounts[2] })
@@ -336,7 +338,7 @@ contract("Swap", accounts => {
             await weth.balanceOf.call(accounts[1]),
         ]
 
-        await prices.setTarget(toWei(1000))
+        await feed.setPrice(toWei(1000))
         await weth.approve(swap.address, toWei(25), { from: accounts[0] })
         await weth.approve(swap.address, toWei(75), { from: accounts[1] })
         await weth.approve(swap.address, toWei(115), { from: accounts[2] })
@@ -351,7 +353,7 @@ contract("Swap", accounts => {
             await weth.balanceOf.call(accounts[1])
         ]
 
-        await prices.setTarget(toWei(800))
+        await feed.setPrice(toWei(800))
         await leth.approve(swap.address, toWei(   25), { from: accounts[0] })
         await leth.approve(swap.address, toWei(   75), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(115000), { from: accounts[2] })
@@ -391,7 +393,7 @@ contract("Swap", accounts => {
             await weth.balanceOf.call(accounts[1]),
         ]
 
-        await prices.setTarget(toWei(1000))
+        await feed.setPrice(toWei(1000))
         await weth.approve(swap.address, toWei(25), { from: accounts[0] })
         await weth.approve(swap.address, toWei(75), { from: accounts[1] })
         await weth.approve(swap.address, toWei(15), { from: accounts[2] })
@@ -406,7 +408,7 @@ contract("Swap", accounts => {
             await weth.balanceOf.call(accounts[1])
         ]
 
-        await prices.setTarget(toWei(1500))
+        await feed.setPrice(toWei(1500))
         await leth.approve(swap.address, toWei(   25), { from: accounts[0] })
         await leth.approve(swap.address, toWei(   75), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(15000), { from: accounts[2] })
@@ -448,7 +450,7 @@ contract("Swap", accounts => {
             await weth.balanceOf.call(accounts[1]),
         ]
 
-        await prices.setTarget(toWei(1000))
+        await feed.setPrice(toWei(1000))
         await weth.approve(swap.address, toWei(25), { from: accounts[0] })
         await weth.approve(swap.address, toWei(75), { from: accounts[1] })
         await weth.approve(swap.address, toWei(115), { from: accounts[2] })
@@ -463,7 +465,7 @@ contract("Swap", accounts => {
             await weth.balanceOf.call(accounts[1])
         ]
 
-        await prices.setTarget(toWei(1600))
+        await feed.setPrice(toWei(1600))
         await leth.approve(swap.address, toWei(   25), { from: accounts[0] })
         await leth.approve(swap.address, toWei(   75), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(115000), { from: accounts[2] })
@@ -503,7 +505,7 @@ contract("Swap", accounts => {
             await weth.balanceOf.call(accounts[1]),
         ]
 
-        await prices.setTarget(toWei(1000))
+        await feed.setPrice(toWei(1000))
         await weth.approve(swap.address, toWei(25), { from: accounts[0] })
         await weth.approve(swap.address, toWei(75), { from: accounts[1] })
         await weth.approve(swap.address, toWei(115), { from: accounts[2] })
@@ -518,7 +520,7 @@ contract("Swap", accounts => {
             await weth.balanceOf.call(accounts[1])
         ]
 
-        await prices.setTarget(toWei(14000))
+        await feed.setPrice(toWei(14000))
         await leth.approve(swap.address, toWei(   25), { from: accounts[0] })
         await leth.approve(swap.address, toWei(   75), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(115000), { from: accounts[2] })
@@ -555,7 +557,7 @@ contract("Swap", accounts => {
 
 
     it("should revert if priority fee is greater than the maximum allowed", async () => {
-        await prices.setTarget(toWei(1000))
+        await feed.setPrice(toWei(1000))
         await weth.approve(swap.address, toWei(10))
 
         try {
@@ -577,8 +579,8 @@ contract("Swap", accounts => {
 
     it("LETH buy  premium @ 1% target tolerance should equal gains from holding through a 1% increase in target price", async () => {
         // set up contract state
-        await prices.setTarget(toWei(1000))
-        await prices.setTolerance(toWei(0))
+        await feed.setPrice(toWei(1000))
+        await rates.setTolerance(toWei(0))
         await weth.approve(swap.address, toWei(25), { from: accounts[0] })
         await weth.approve(swap.address, toWei(115), { from: accounts[2] })
         await weth.approve(swap.address, toWei(85), { from: accounts[3] })
@@ -588,12 +590,12 @@ contract("Swap", accounts => {
 
         const wethBalBefore = await weth.balanceOf.call(accounts[1])
 
-        await prices.setTolerance(toWei(0.01))
+        await rates.setTolerance(toWei(0.01))
         await weth.approve(swap.address, toWei(150), { from: accounts[1] })
         await swap.buyFloat(toWei(75), { from: accounts[1] });
         await weth.approve(swap.address, toWei(0), { from: accounts[1] })
-        await prices.setTolerance(toWei(0))
-        await prices.setTarget(toWei(1000*1.01))
+        await rates.setTolerance(toWei(0))
+        await feed.setPrice(toWei(1000*1.01))
         await leth.approve(swap.address, toWei(   75), { from: accounts[1] })
         await swap.sellFloat(toWei(75), { from: accounts[1] });
 
@@ -613,8 +615,8 @@ contract("Swap", accounts => {
 
     it("LETH sell premium @ 1% target tolerance should equal cost of holding through a 1% decrease in target price", async () => {
         // set up contract state
-        await prices.setTarget(toWei(1000))
-        await prices.setTolerance(toWei(0))
+        await feed.setPrice(toWei(1000))
+        await rates.setTolerance(toWei(0))
         await weth.approve(swap.address, toWei(25), { from: accounts[0] })
         await weth.approve(swap.address, toWei(115), { from: accounts[2] })
         await weth.approve(swap.address, toWei(85), { from: accounts[3] })
@@ -626,7 +628,7 @@ contract("Swap", accounts => {
 
         const wethBalBefore = await weth.balanceOf.call(accounts[1])
 
-        await prices.setTolerance(toWei(0.01))
+        await rates.setTolerance(toWei(0.01))
         await leth.approve(swap.address, toWei(100), { from: accounts[1] })
         await swap.sellFloat(toWei(75), { from: accounts[1] });
         await leth.approve(swap.address, toWei(0), { from: accounts[1] })
@@ -654,8 +656,8 @@ contract("Swap", accounts => {
 
     it("EUSD buy  premium @ 1% target tolerance should equal gains from holding through a 1% decrease in target price", async () => {
         // set up contract state
-        await prices.setTarget(toWei(1000))
-        await prices.setTolerance(toWei(0))
+        await feed.setPrice(toWei(1000))
+        await rates.setTolerance(toWei(0))
         await weth.approve(swap.address, toWei(10.101), { from: accounts[1] })
         await weth.approve(swap.address, toWei(  .304), { from: accounts[2] })
         await weth.approve(swap.address, toWei(    11), { from: accounts[3] })
@@ -665,12 +667,12 @@ contract("Swap", accounts => {
 
         const wethBalBefore = await weth.balanceOf.call(accounts[0])
         
-        await prices.setTolerance(toWei(0.01))
+        await rates.setTolerance(toWei(0.01))
         await weth.approve(swap.address, toWei(3), { from: accounts[0] })
         await swap.buyFixed(toWei( 2077), { from: accounts[0] });
         await weth.approve(swap.address, toWei(0), { from: accounts[0] })
-        await prices.setTarget(toWei(1000*0.99))
-        await prices.setTolerance(toWei(0))
+        await feed.setPrice(toWei(1000*0.99))
+        await rates.setTolerance(toWei(0))
         await eusd.approve(swap.address, toWei( 2077), { from: accounts[0] })
         await swap.sellFixed(toWei( 2077), { from: accounts[0] });
 
@@ -689,8 +691,8 @@ contract("Swap", accounts => {
 
     it("EUSD sell premium @ 1% target tolerance should equal cost of holding through a 1% increase in target price", async () => {
         // set up contract state
-        await prices.setTarget(toWei(1000))
-        await prices.setTolerance(toWei(0))
+        await feed.setPrice(toWei(1000))
+        await rates.setTolerance(toWei(0))
         await weth.approve(swap.address, toWei(10.101), { from: accounts[1] })
         await weth.approve(swap.address, toWei(  .304), { from: accounts[2] })
         await weth.approve(swap.address, toWei(    11), { from: accounts[3] })
@@ -703,7 +705,7 @@ contract("Swap", accounts => {
 
         const wethBalBefore = await weth.balanceOf.call(accounts[0])
 
-        await prices.setTolerance(toWei(0.01))
+        await rates.setTolerance(toWei(0.01))
         await eusd.approve(swap.address, toWei( 2077), { from: accounts[0] })
         await swap.sellFixed(toWei( 2077), { from: accounts[0] });
 

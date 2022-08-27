@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/JonahGroendal/volatility-swap#readme",
   "dependencies": {
+    "@chainlink/contracts": "^0.4.1",
     "@openzeppelin/contracts": "^4.4.2",
     "truffle": "^5.5.0"
   },

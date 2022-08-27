@@ -1,16 +1,45 @@
 const BN = web3.utils.BN
-const MockRates = artifacts.require("MockRates")
+const MockPriceFeed = artifacts.require("MockPriceFeed")
+const Rates = artifacts.require("Rates")
 const { time } = require('openzeppelin-test-helpers');
 
 const toWei = amount => (new BN(amount*10000000000)).mul((new BN(10)).pow(new BN(8)))
 
 contract("Rates", accounts => {
     let rates;
+    let feed;
 
     beforeEach(async () => {
-        rates = await MockRates.deployed()
+        rates = await Rates.deployed()
+        feed = await MockPriceFeed.deployed()
     })
 
+    it("should restrict acccess to setTolerance()", async () => {
+        try {
+            await rates.setTolerance(toWei(2), { from: accounts[1] });
+        } catch(e) {
+            return;
+        }
+        assert.fail();
+    })
+
+    it("should restrict acccess to setInterest()", async () => {
+        try {
+            await rates.setInterest(toWei(2), { from: accounts[1] });
+        } catch(e) {
+            return;
+        }
+        assert.fail();
+    })
+
+    it("should restrict acccess to setMaxPriorityFee()", async () => {
+        try {
+            await rates.setMaxPriorityFee(toWei(2), { from: accounts[1] });
+        } catch(e) {
+            return;
+        }
+        assert.fail();
+    })
 
     it("should correctly calculate accrewed interest after 3 hours", async () => {
         await time.increase(time.duration.seconds(3600*10.2));
@@ -30,7 +59,7 @@ contract("Rates", accounts => {
     })
 
     it("should correctly calculate fixed value at the current interest rate", async () => {
-        await rates.setTarget(toWei(1000));
+        await feed.setPrice(toWei(1000));
         const rate = await rates.fixedValue.call();
         const multiplier = await rates.accIntMul.call()
         const expected = toWei(1000).mul((new BN(10)).pow(new BN(26))).div(multiplier)
