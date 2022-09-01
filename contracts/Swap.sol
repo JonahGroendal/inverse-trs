@@ -1,10 +1,11 @@
 pragma solidity ^0.8.11;
 
+import "./ISwap.sol";
 import "./IRates.sol";
 import "./IToken.sol";
 
 /// @dev if collateralization ratio drops below 1, stablecoin holders can claim their share of the remaining collateral but the system needs to be redeployed.
-contract Swap {
+contract Swap is ISwap {
     uint constant ONE = 10**18;
 
     /// @notice Minimum allowed value of floatLeg in underlying
@@ -12,21 +13,21 @@ contract Swap {
     uint constant MIN_FLOAT_TV = 10**13;
 
     /// @notice Tracks exchange rates, accrewed interest, and premiums
-    IRates private rates;
+    IRates public rates;
 
     /// @notice Tokens comprising the swap's fixed leg
     /// @notice Pegged to denominating asset + accrewed interest
     /// @dev Must use 18 decimals
-    IToken private fixedLeg;
+    IToken public fixedLeg;
 
     /// @notice Tokens comprising the swap's floating leg
     /// @notice Pegged to [R/(R-1)]x leveraged underlying
     /// @dev Must use 18 decimals
-    IToken private floatLeg;
+    IToken public floatLeg;
 
     /// @notice Token collateralizing fixedLeg / underlying floatLeg
     /// @dev Must use 18 decimals
-    IToken private underlying;
+    IToken public underlying;
 
     constructor(address _rates, address _fixedLeg, address _floatLeg, address _underlying) {
         rates      = IRates(_rates);
@@ -104,7 +105,7 @@ contract Swap {
     }
 
     /// @return Value in underlying of all floatLeg tokens
-    function floatTotalValue(uint _fixedTotalNomValue) internal view returns (uint) {
+    function floatTotalValue(uint _fixedTotalNomValue) public view returns (uint) {
         uint _potValue = potValue();
         if (_potValue > _fixedTotalNomValue) {
             return _potValue - _fixedTotalNomValue;
@@ -113,7 +114,7 @@ contract Swap {
     }
 
     /// @return Value in underlying of `amount` fixedLeg tokens
-    function fixedValue(uint amount) internal view returns (uint) {
+    function fixedValue(uint amount) public view returns (uint) {
         uint value = rates.fixedValue();
         uint totalValue = fixedTotalNomValue(value);
         uint _potValue = potValue();
@@ -124,11 +125,11 @@ contract Swap {
 
     /// @return Nominal value in underlying of all fixedLeg tokens
     /// @param value Nominal value in underlying of 1 fixedLeg token
-    function fixedTotalNomValue(uint value) internal view returns (uint) {
+    function fixedTotalNomValue(uint value) public view returns (uint) {
         return fixedLeg.totalSupply()*ONE/value;
     }
 
-    function potValue() internal view returns (uint) {
+    function potValue() public view returns (uint) {
         return underlying.balanceOf(address(this));
     }
 }
