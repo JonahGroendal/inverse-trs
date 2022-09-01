@@ -21,14 +21,15 @@ contract Rates is IRates, Ownable {
     /// @notice Amount the price feed can safely deviate from the actual exchange rate due to latency
     /// @dev Used to calculate buy/sell premiums.
     /// @dev 18-decimal fixed-point percentage
-    uint internal tolerance;
+    uint public tolerance;
 
     /// @notice 1 + hourly interest rate. Rate can be negative
     /// @dev 18-decimal fixed-point
     uint public interest = ONE;
 
-    /// @notice Timestamp of when interest began accrewing 
-    uint internal startTime = block.timestamp;
+    /// @notice Timestamp of when interest began accrewing
+    /// @dev start at a perfect multiple of COMPOUNDING_PERIOD so all contracts are syncronized
+    uint internal startTime = (block.timestamp / COMPOUNDING_PERIOD) * COMPOUNDING_PERIOD;
 
     /// @notice Value of accumulated interest multiplier when interest began accrewing
     uint internal startValue = ONE_26;

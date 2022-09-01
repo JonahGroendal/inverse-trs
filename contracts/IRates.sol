@@ -3,6 +3,7 @@ pragma solidity >=0.4.22 <0.9.0;
 interface IRates {
     function interest() external view returns (uint);
     function maxPriorityFee() external view returns (uint);
+    function tolerance() external view returns (uint);
 
     function fixedValue() external view returns (uint);
     function accIntMul() external view returns (uint);

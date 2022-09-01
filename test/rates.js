@@ -44,7 +44,7 @@ contract("Rates", accounts => {
     it("should correctly calculate accrewed interest after 3 hours", async () => {
         await time.increase(time.duration.seconds(3600*10.2));
         await rates.setInterest(new BN("1000022815890000000")) // .2/8765.82
-        await time.increase(time.duration.seconds(3600*3.5));
+        await time.increase(time.duration.seconds(3600*3));
         const multiplier = await rates.accIntMul.call()
 
         assert.equal(multiplier.toString().substring(0, 19), "1000068449231706386")
@@ -52,7 +52,7 @@ contract("Rates", accounts => {
 
     it("should correctly calculate accrewed interest after 20 hours after it's changed", async () => {
         await rates.setInterest(new BN("1000003422383758735")) // .03/8765.82
-        await time.increase(time.duration.seconds(3600*20.1));
+        await time.increase(time.duration.seconds(3600*20));
         const multiplier = await rates.accIntMul.call()
 
         assert.equal(multiplier.toString().substring(0, 19), "1000136903817684905")
