@@ -43,7 +43,7 @@ contract Swap {
     }
 
     /// @notice Buy into fixed leg, minting `amount` tokens
-    function buyFixed(uint amount) public limitedPriority {
+    function buyFixed(uint amount, address to) public limitedPriority {
         uint value = fixedValue(amount);
         require(value > 0, "Zero value trade");
         underlying.transferFrom(
@@ -51,22 +51,22 @@ contract Swap {
             address(this),
             value + rates.fixedBuyPremium(value)
         );
-        fixedLeg.mint(msg.sender, amount);
+        fixedLeg.mint(to, amount);
     }
 
     /// @notice Sell out of fixed leg, burning `amount` tokens
-    function sellFixed(uint amount) public limitedPriority {
+    function sellFixed(uint amount, address to) public limitedPriority {
         uint value = fixedValue(amount);
         require(value > 0, "Zero value trade");
         underlying.transfer(
-            msg.sender,
+            to,
             value - rates.fixedSellPremium(value)
         );
         fixedLeg.burnFrom(msg.sender, amount);
     }
 
     /// @notice Buy into floating leg, minting `amount` tokens
-    function buyFloat(uint amount) public limitedPriority {
+    function buyFloat(uint amount, address to) public limitedPriority {
         uint fixedTV = fixedTotalNomValue(rates.fixedValue());
         uint floatTV = floatTotalValue(fixedTV);
         uint value   = floatValue(amount, floatTV);
@@ -76,17 +76,17 @@ contract Swap {
             address(this),
             value + rates.floatBuyPremium(value, fixedTV, floatTV)
         );
-        floatLeg.mint(msg.sender, amount);
+        floatLeg.mint(to, amount);
     }
 
     /// @notice Sell out of floating leg, burning `amount` tokens
-    function sellFloat(uint amount) public limitedPriority {
+    function sellFloat(uint amount, address to) public limitedPriority {
         uint fixedTV = fixedTotalNomValue(rates.fixedValue());
         uint floatTV = floatTotalValue(fixedTV);
         uint value   = floatValue(amount, floatTV);
         require(value > 0, "Zero value trade");
         underlying.transfer(
-            msg.sender,
+            to,
             value - rates.floatSellPremium(value, fixedTV, floatTV)
         );
         floatLeg.burnFrom(msg.sender, amount);
