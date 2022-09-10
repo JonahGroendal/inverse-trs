@@ -2,13 +2,13 @@ pragma solidity ^0.8.11;
 
 import "./IRates.sol";
 import "./IModel.sol";
-import "./MathUtils.sol";
+import "./Math.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 /// @notice Tracks exchange rate, interest rate, accrewed interest and premiums
 contract Rates is IRates, Ownable {
-    using MathUtils for uint;
+    using Math for uint;
 
     uint constant ONE    = 10**18;
     uint constant ONE_26 = 10**26;

@@ -3,7 +3,7 @@ const MockMath = artifacts.require("MockMath")
 
 const to26 = amount => (new BN(amount*10000000000)).mul((new BN(10)).pow(new BN(16)))
 
-contract("MathUtils", accounts => {
+contract("Math", accounts => {
     let math;
 
     beforeEach(async () => {

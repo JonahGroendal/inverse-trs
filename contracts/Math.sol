@@ -1,6 +1,6 @@
 pragma solidity ^0.8.11;
 
-library MathUtils {
+library Math {
     uint constant ONE_26 = 10**26;
 
     /// @notice Calculate `base`^`n`

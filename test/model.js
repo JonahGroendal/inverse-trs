@@ -22,34 +22,29 @@ contract('LinearModel', async () => {
         model = await LinearModel.deployed()
     })
 
-    it('should correctly calculate interst rate when collateral ratio is 1', async () => {
+    it('should correctly calculate interest rate when collateral ratio is 1', async () => {
         const rate = await model.getInterestRate.call(toWei(1), toWei(1))
-        
         assert.equal(rate.toString(), expected(1).toString())
     })
 
     // should be 0
-    it('should correctly calculate interst rate when collateral ratio is 1.4', async () => {
+    it('should correctly calculate interest rate when collateral ratio is 1.4', async () => {
         const rate = await model.getInterestRate.call(toWei(1.4), toWei(1))
-        
         assert.equal(rate.toString(), expected(1.4).toString())
     })
     
-    it('should correctly calculate interst rate when collateral ratio is 1.5', async () => {
+    it('should correctly calculate interest rate when collateral ratio is 1.5', async () => {
         const rate = await model.getInterestRate.call(toWei(1.5), toWei(1))
-        console.log(expected(1.5).toString())
         assert.equal(rate.toString(), expected(1.5).toString())
     })
 
-    it('should correctly calculate interst rate when collateral ratio is 2', async () => {
+    it('should correctly calculate interest rate when collateral ratio is 2', async () => {
         const rate = await model.getInterestRate.call(toWei(2), toWei(1))
-        
         assert.equal(rate.toString(), expected(2).toString())
     })
 
-    it('should correctly calculate interst rate when collateral ratio is 1.048796556', async () => {
+    it('should correctly calculate interest rate when collateral ratio is 1.048796556', async () => {
         const rate = await model.getInterestRate.call(toWei(1.048796556), toWei(1))
-        
         assert.equal(rate.toString(), expected(1.048796556).toString())
     })
 })
