@@ -13,9 +13,9 @@ interface ISwap {
     function sellFloat(uint amount, address to) external;
 
     function floatValue(uint amount, uint totalValue) external view returns (uint);
-    function floatTotalValue(uint _fixedTotalNomValue) external view returns (uint);
+    function floatTV(uint _fixedTV) external view returns (uint);
     function fixedValue(uint amount) external view returns (uint);
-    function fixedTotalNomValue(uint value) external view returns (uint);
+    function fixedTV(uint value) external view returns (uint);
     function potValue() external view returns (uint);
 
     function updateInterest() external;

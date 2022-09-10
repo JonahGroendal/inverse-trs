@@ -66,8 +66,8 @@ contract Swap is ISwap, Rates {
 
     /// @notice Buy into floating leg, minting `amount` tokens
     function buyFloat(uint amount, address to) public limitedPriority {
-        uint fixedTV = fixedTotalNomValue(fixedValue());
-        uint floatTV = floatTotalValue(fixedTV);
+        uint fixedTV = fixedTV(fixedValue());
+        uint floatTV = floatTV(fixedTV);
         uint value   = floatValue(amount, floatTV);
         require(value > 0, "Zero value trade");
         underlying.transferFrom(
@@ -81,8 +81,8 @@ contract Swap is ISwap, Rates {
 
     /// @notice Sell out of floating leg, burning `amount` tokens
     function sellFloat(uint amount, address to) public limitedPriority {
-        uint fixedTV = fixedTotalNomValue(fixedValue());
-        uint floatTV = floatTotalValue(fixedTV);
+        uint fixedTV = fixedTV(fixedValue());
+        uint floatTV = floatTV(fixedTV);
         uint value   = floatValue(amount, floatTV);
         require(value > 0, "Zero value trade");
         underlying.transfer(
@@ -105,10 +105,10 @@ contract Swap is ISwap, Rates {
     }
 
     /// @return Value in underlying of all floatLeg tokens
-    function floatTotalValue(uint _fixedTotalNomValue) public view returns (uint) {
+    function floatTV(uint _fixedTV) public view returns (uint) {
         uint _potValue = potValue();
-        if (_potValue > _fixedTotalNomValue) {
-            return _potValue - _fixedTotalNomValue;
+        if (_potValue > _fixedTV) {
+            return _potValue - _fixedTV;
         }
         return 0;
     }
@@ -116,7 +116,7 @@ contract Swap is ISwap, Rates {
     /// @return Value in underlying of `amount` fixedLeg tokens
     function fixedValue(uint amount) public view returns (uint) {
         uint value = fixedValue();
-        uint totalValue = fixedTotalNomValue(value);
+        uint totalValue = fixedTV(value);
         uint _potValue = potValue();
         if (_potValue < totalValue)
             return amount*_potValue/fixedLeg.totalSupply();
@@ -125,7 +125,7 @@ contract Swap is ISwap, Rates {
 
     /// @return Nominal value in underlying of all fixedLeg tokens
     /// @param value Nominal value in underlying of 1 fixedLeg token
-    function fixedTotalNomValue(uint value) public view returns (uint) {
+    function fixedTV(uint value) public view returns (uint) {
         return fixedLeg.totalSupply()*ONE/value;
     }
 
@@ -136,6 +136,6 @@ contract Swap is ISwap, Rates {
     /// @dev Always called after a buy or sell but can be called by anyone at any time
     /// @dev Would behoove some stakeholders to call this after a price change
     function updateInterest() public {
-        _updateInterest(potValue(), fixedTotalNomValue(fixedValue()));
+        _updateInterest(potValue(), fixedTV(fixedValue()));
     }
 }

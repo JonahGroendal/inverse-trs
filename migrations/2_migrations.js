@@ -4,6 +4,7 @@ const Token = artifacts.require("Token");
 const Swap = artifacts.require("Swap");
 const Rates = artifacts.require("Rates");
 const MockModel = artifacts.require("MockModel")
+const LinearModel = artifacts.require("LinearModel")
 const MockPriceFeed = artifacts.require("MockPriceFeed");
 const MockWETH = artifacts.require("MockWETH");
 const MathUtils = artifacts.require("MathUtils");
@@ -17,6 +18,7 @@ module.exports = async function (deployer, network, accounts) {
     await deployer.deploy(MockMath)
     await deployer.deploy(MockPriceFeed)
     await deployer.deploy(MockModel)
+    await deployer.deploy(LinearModel)
     await deployer.deploy(Rates, MockPriceFeed.address, MockModel.address)
     await deployer.deploy(MockWETH, accounts)
 

@@ -4,11 +4,10 @@ import "./IModel.sol";
 
 abstract contract Model is IModel {
     int constant ONE = 10**18;
-    int constant STEP = ONE / 1000; // 0.1%
-    int constant HALF_STEP = STEP / 2;
+    int constant STEP = ONE / 8765820; // 0.1% annually, compounded hourly
 
     function getInterestRate(uint potValue, uint fixedTV) external pure returns (int) {
-        return((f(potValue, fixedTV) + HALF_STEP) / STEP) * STEP;
+        return(f(potValue, fixedTV) / STEP) * STEP;
     }
 
     function f(uint potValue, uint fixedTV) internal virtual pure returns (int);
