@@ -163,14 +163,28 @@ could be the way to go.
   - more catastrophic for fixed-leg holders if there's a default. BUT less so for floating-leg holders
   - more code when we could just redeploy. It's never supposed to happen anyway
 
+### Pay interest on floating-leg total value
+Rather than on fixed-leg total value, the current behavior
+pros:
+  - helps keep system at equlibrium
+    - if coll ratio decreases:
+      - fixed-leg interest rate decreases
+      - interest on float-leg notional value (i.e. margin) decreases
+  - lets system find a competitive fixed-leg interest rate
+    - based on the market interest rate for margin
+cons:
+  - implementation is much more complex
+    - size of float-leg pool changes continuously over time making interest payment calculations difficult
+      - well, almost continuously. Changes every price feed update
+    - might be easier to just periodically update the fixed-leg interest rate based on float-leg size
+
+
 
 # TODO
-- add `to` address parameter to buy and sell functions
 - look into using super cheap exp() function
 - consolidate premium rates functions
 - make sure not vulnerable to erc 777 reentry
   - just dont use ERC-777
-- make interest rate payments at times such that all swap contracts are syncronized (e.g. every perfect multiple of 3600 secs since unix epoch)
 - improve method names of Rates contract
 - look into being erc-4626 compatible.
   - There doesn't seem to be a good way of doing it where both tokens are supported by the standard

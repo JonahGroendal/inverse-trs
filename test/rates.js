@@ -1,6 +1,7 @@
 const BN = web3.utils.BN
 const MockPriceFeed = artifacts.require("MockPriceFeed")
-const Rates = artifacts.require("Rates")
+const MockModel = artifacts.require("MockModel")
+const Rates = artifacts.require("Swap")
 const { time } = require('openzeppelin-test-helpers');
 
 const toWei = amount => (new BN(amount*10000000000)).mul((new BN(10)).pow(new BN(8)))
@@ -8,10 +9,12 @@ const toWei = amount => (new BN(amount*10000000000)).mul((new BN(10)).pow(new BN
 contract("Rates", accounts => {
     let rates;
     let feed;
+    let model;
 
     beforeEach(async () => {
         rates = await Rates.deployed()
-        feed = await MockPriceFeed.deployed()
+        feed  = await MockPriceFeed.deployed()
+        model = await MockModel.deployed()
     })
 
     it("should restrict acccess to setTolerance()", async () => {
@@ -43,7 +46,8 @@ contract("Rates", accounts => {
 
     it("should correctly calculate accrewed interest after 3 hours", async () => {
         await time.increase(time.duration.seconds(3600*10.2));
-        await rates.setInterest(new BN("1000022815890000000")) // .2/8765.82
+        await model.setInterest(new BN("0000022815890000000")) // .2/8765.82
+        await rates.updateInterest()
         await time.increase(time.duration.seconds(3600*3));
         const multiplier = await rates.accIntMul.call()
 
@@ -51,7 +55,8 @@ contract("Rates", accounts => {
     })
 
     it("should correctly calculate accrewed interest after 20 hours after it's changed", async () => {
-        await rates.setInterest(new BN("1000003422383758735")) // .03/8765.82
+        await model.setInterest(new BN("0000003422383758735")) // .03/8765.82
+        await rates.updateInterest()
         await time.increase(time.duration.seconds(3600*20));
         const multiplier = await rates.accIntMul.call()
 
@@ -66,5 +71,4 @@ contract("Rates", accounts => {
 
         assert.equal(rate.toString(), expected.toString())
     })
-    
 })

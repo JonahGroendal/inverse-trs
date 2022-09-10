@@ -1,10 +1,8 @@
 pragma solidity ^0.8.11;
 
-import "./IRates.sol";
 import "./IToken.sol";
 
 interface ISwap {
-    function rates()      external returns (IRates);
     function fixedLeg()   external returns (IToken);
     function floatLeg()   external returns (IToken);
     function underlying() external returns (IToken);
@@ -19,4 +17,6 @@ interface ISwap {
     function fixedValue(uint amount) external view returns (uint);
     function fixedTotalNomValue(uint value) external view returns (uint);
     function potValue() external view returns (uint);
+
+    function updateInterest() external;
 }

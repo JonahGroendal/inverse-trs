@@ -1,19 +1,14 @@
 pragma solidity ^0.8.11;
 
 import "./ISwap.sol";
-import "./IRates.sol";
+import "./Rates.sol";
 import "./IToken.sol";
 
 /// @dev if collateralization ratio drops below 1, stablecoin holders can claim their share of the remaining collateral but the system needs to be redeployed.
-contract Swap is ISwap {
-    uint constant ONE = 10**18;
-
+contract Swap is ISwap, Rates {
     /// @notice Minimum allowed value of floatLeg in underlying
     /// @dev prevents floatLeg `totalSupply` from growing too quickly and overflowing
     uint constant MIN_FLOAT_TV = 10**13;
-
-    /// @notice Tracks exchange rates, accrewed interest, and premiums
-    IRates public rates;
 
     /// @notice Tokens comprising the swap's fixed leg
     /// @notice Pegged to denominating asset + accrewed interest
@@ -29,8 +24,9 @@ contract Swap is ISwap {
     /// @dev Must use 18 decimals
     IToken public underlying;
 
-    constructor(address _rates, address _fixedLeg, address _floatLeg, address _underlying) {
-        rates      = IRates(_rates);
+    constructor(address _priceFeed, address _model, address _fixedLeg, address _floatLeg, address _underlying)
+    Rates(_priceFeed, _model)
+    {
         fixedLeg   = IToken(_fixedLeg);
         floatLeg   = IToken(_floatLeg);
         underlying = IToken(_underlying);
@@ -39,7 +35,7 @@ contract Swap is ISwap {
     /// @notice limit TX priority to prevent fruntrunning price oracle updates
     /// @notice Also should delay trades to prevent trading on advanced price knowledge.
     modifier limitedPriority {
-        require(tx.gasprice - block.basefee <= rates.maxPriorityFee(), "Priority fee too high");
+        require(tx.gasprice - block.basefee <= maxPriorityFee, "Priority fee too high");
         _;
     }
 
@@ -50,9 +46,10 @@ contract Swap is ISwap {
         underlying.transferFrom(
             msg.sender,
             address(this),
-            value + rates.fixedBuyPremium(value)
+            value + fixedBuyPremium(value)
         );
         fixedLeg.mint(to, amount);
+        updateInterest();
     }
 
     /// @notice Sell out of fixed leg, burning `amount` tokens
@@ -61,36 +58,39 @@ contract Swap is ISwap {
         require(value > 0, "Zero value trade");
         underlying.transfer(
             to,
-            value - rates.fixedSellPremium(value)
+            value - fixedSellPremium(value)
         );
         fixedLeg.burnFrom(msg.sender, amount);
+        updateInterest();
     }
 
     /// @notice Buy into floating leg, minting `amount` tokens
     function buyFloat(uint amount, address to) public limitedPriority {
-        uint fixedTV = fixedTotalNomValue(rates.fixedValue());
+        uint fixedTV = fixedTotalNomValue(fixedValue());
         uint floatTV = floatTotalValue(fixedTV);
         uint value   = floatValue(amount, floatTV);
         require(value > 0, "Zero value trade");
         underlying.transferFrom(
             msg.sender,
             address(this),
-            value + rates.floatBuyPremium(value, fixedTV, floatTV)
+            value + floatBuyPremium(value, fixedTV, floatTV)
         );
         floatLeg.mint(to, amount);
+        updateInterest();
     }
 
     /// @notice Sell out of floating leg, burning `amount` tokens
     function sellFloat(uint amount, address to) public limitedPriority {
-        uint fixedTV = fixedTotalNomValue(rates.fixedValue());
+        uint fixedTV = fixedTotalNomValue(fixedValue());
         uint floatTV = floatTotalValue(fixedTV);
         uint value   = floatValue(amount, floatTV);
         require(value > 0, "Zero value trade");
         underlying.transfer(
             to,
-            value - rates.floatSellPremium(value, fixedTV, floatTV)
+            value - floatSellPremium(value, fixedTV, floatTV)
         );
         floatLeg.burnFrom(msg.sender, amount);
+        updateInterest();
     }
 
     /// @return Value in underlying of `amount` floatLeg tokens
@@ -115,7 +115,7 @@ contract Swap is ISwap {
 
     /// @return Value in underlying of `amount` fixedLeg tokens
     function fixedValue(uint amount) public view returns (uint) {
-        uint value = rates.fixedValue();
+        uint value = fixedValue();
         uint totalValue = fixedTotalNomValue(value);
         uint _potValue = potValue();
         if (_potValue < totalValue)
@@ -131,5 +131,11 @@ contract Swap is ISwap {
 
     function potValue() public view returns (uint) {
         return underlying.balanceOf(address(this));
+    }
+
+    /// @dev Always called after a buy or sell but can be called by anyone at any time
+    /// @dev Would behoove some stakeholders to call this after a price change
+    function updateInterest() public {
+        _updateInterest(potValue(), fixedTotalNomValue(fixedValue()));
     }
 }

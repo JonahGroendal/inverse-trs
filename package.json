@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "truffle test",
-    "compile": "truffle compile"
+    "compile": "truffle compile",
+    "clean": "truffle networks --clean"
   },
   "repository": {
     "type": "git",

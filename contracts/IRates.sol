@@ -13,8 +13,8 @@ interface IRates {
     function floatBuyPremium(uint value, uint fixedTotalValue, uint floatTotalValue) external view returns (uint);
     function floatSellPremium(uint value, uint fixedTotalValue, uint floatTotalValue) external view returns (uint);
 
-    function setInterest(uint _interest) external;
     function setMaxPriorityFee(uint _maxPriorityFee) external;
     function setTolerance(uint _tolerance) external;
     function setPriceFeed(address _priceFeed) external;
+    function setModel(address _model) external;
 }

@@ -1,10 +1,12 @@
 pragma solidity ^0.8.11;
 
 import "./IRates.sol";
+import "./IModel.sol";
 import "./MathUtils.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
+/// @notice Tracks exchange rate, interest rate, accrewed interest and premiums
 contract Rates is IRates, Ownable {
     using MathUtils for uint;
 
@@ -34,19 +36,23 @@ contract Rates is IRates, Ownable {
     /// @notice Value of accumulated interest multiplier when interest began accrewing
     uint internal startValue = ONE_26;
 
-    constructor(address _priceFeed) {
+    /// @notice Interest rate model
+    IModel public model;
+
+    constructor(address _priceFeed, address _model) {
         setPriceFeed(_priceFeed);
+        setModel(_model);
     }
 
     /// @return Nominal value of 1 underlying token in fixedLeg
     /// @dev underlying exchange rate + accrewed interest
     function fixedValue() public view returns (uint) {
-        return underlying() * ONE_26 / accIntMul();
+        return underlyingValue() * ONE_26 / accIntMul();
     }
 
     /// @return Value of underlying in denominating currency. 
     /// @dev Gets exchange rate from a price feed.
-    function underlying() internal view returns (uint) {
+    function underlyingValue() internal view returns (uint) {
         (
             /*uint80 roundID*/,
             int price,
@@ -99,14 +105,6 @@ contract Rates is IRates, Ownable {
         return ((value * ONE / (ONE - tolerance)) - value) * fixedTotalValue / floatTotalValue;
     }
 
-    /// @notice Change the hourly interest rate. May represent a negative rate.
-    /// @param _interest 18-decimal fixed-point. 1 + hourly interest rate.
-    function setInterest(uint _interest) public onlyOwner {
-        startValue = accIntMul();
-        startTime = startTime + (((block.timestamp - startTime) / COMPOUNDING_PERIOD) * COMPOUNDING_PERIOD);
-        interest = _interest;
-    }
-
     function setMaxPriorityFee(uint _maxPriorityFee) public onlyOwner {
         maxPriorityFee = _maxPriorityFee;
     }
@@ -117,5 +115,25 @@ contract Rates is IRates, Ownable {
 
     function setPriceFeed(address _priceFeed) public onlyOwner {
         priceFeed = AggregatorV3Interface(_priceFeed);
+    }
+
+    function setModel(address _model) public onlyOwner {
+        model = IModel(_model);
+    }
+
+    /// @notice Update interest rate according to model
+    function _updateInterest(uint potValue, uint fixedTV) internal {
+        uint newRate = uint(int(ONE) + model.getInterestRate(potValue, fixedTV));
+        if (newRate != interest) {
+            _setInterest(newRate);
+        }
+    }
+
+    /// @notice Change the hourly interest rate. May represent a negative rate.
+    /// @param _interest 18-decimal fixed-point. 1 + hourly interest rate.
+    function _setInterest(uint _interest) internal {
+        startValue = accIntMul();
+        startTime = startTime + (((block.timestamp - startTime) / COMPOUNDING_PERIOD) * COMPOUNDING_PERIOD);
+        interest = _interest;
     }
 }
