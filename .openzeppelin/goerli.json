@@ -2,25 +2,25 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0x9Ed2a26455ea6e1C23D96975e7031798d2E106Bb",
-      "txHash": "0x359ddf5a496868cc0620351fbe5cf75e3442fade5d039952c7f396de8f74511b",
+      "address": "0x2f81617ca449ce0bF819C5F56a7B3FB87818ceF1",
+      "txHash": "0x6057e7909824f7ae43c638040679e4000f1440cf0f8b6e2fe58fdc0cd4e8c47f",
       "kind": "uups"
     },
     {
-      "address": "0x326A4BE762940Fdd9Ce78c0c21524C0D0Da314D3",
-      "txHash": "0x31eb34478e489977f17b1d84445c4da33354b9651b9e3a38ac01943f9738f41c",
+      "address": "0xECCC3ca9e90525fb7034551bCd2ae629b7E80022",
+      "txHash": "0x0feb7f771597714049eb26131bc2fa42b3e63784b08bddf64b5eb7bb47493d10",
       "kind": "uups"
     },
     {
-      "address": "0xC7ed03A2f161daC39Dd874a22B2A7a4FbD55d358",
-      "txHash": "0x36db7e5ef37f48652bf74982d2684f95c0ee126f5f5ebd18f522223c07bbf594",
+      "address": "0x09913D0ec77f2623ea4693BD90334ab4a1c28056",
+      "txHash": "0x86a4fdfa308045422e92ef273ed62eaada05a196fe2b3f4b7ea13565313be7f3",
       "kind": "uups"
     }
   ],
   "impls": {
-    "f193bf1f2a865cec22d43cb9431fdacf55346a71e35f2c8ba37bbab772de6128": {
-      "address": "0xEc26FC941063e3725174DEF55047534F4C62Fb79",
-      "txHash": "0xc4dab5f91f9ed3970c54126441af5199fc651378d1cae6febc9e4e85a5500e55",
+    "ec3f858baf9716179ce65149e2960f881f11a4b8dc6bc806b4361b70142d006e": {
+      "address": "0x005528905E9eDb5B90121f180a6ecDbc664aE361",
+      "txHash": "0x276fc8ae4b464e12ded6d7c301df22a49f545309005dee259d2b5736e9fdd5cf",
       "layout": {
         "storage": [
           {
@@ -275,9 +275,9 @@
         }
       }
     },
-    "f4c0bb963d9519bb4c34277c7f20c31fbb2a39a948bc458ec84bbfe73d2410bd": {
-      "address": "0xD796fD22cF0B030353Ac875239c3B1392F9f7917",
-      "txHash": "0xa802f8a1a8f926d7685cb19f64ef03134742a3eeb9a742e372e6712b7eeb0366",
+    "15523451fd383ae989d1e602ab2cb2adf0f090af1e23c140fdc9286d7dfda9b4": {
+      "address": "0xc16c9e6968a4AeDAFe05402eb176522B78bd4f77",
+      "txHash": "0xab6bd48f213e79a2648dee6cbdf482616dd685fbe13c843874a1c77cdcaa11cc",
       "layout": {
         "storage": [
           {
@@ -362,30 +362,30 @@
           {
             "contract": "Rates",
             "label": "model",
-            "type": "t_contract(IModel)7323",
+            "type": "t_contract(IModel)9237",
             "src": "../project:/contracts/Rates.sol:43"
           },
           {
             "contract": "Swap",
             "label": "fixedLeg",
-            "type": "t_contract(IToken)7598",
+            "type": "t_contract(IToken)9512",
             "src": "../project:/contracts/Swap.sol:16"
           },
           {
             "contract": "Swap",
             "label": "floatLeg",
-            "type": "t_contract(IToken)7598",
+            "type": "t_contract(IToken)9512",
             "src": "../project:/contracts/Swap.sol:21"
           },
           {
             "contract": "Swap",
             "label": "underlying",
-            "type": "t_contract(IToken)7598",
+            "type": "t_contract(IToken)9512",
             "src": "../project:/contracts/Swap.sol:25"
           }
         ],
         "types": {
-          "t_contract(IToken)7598": {
+          "t_contract(IToken)9512": {
             "label": "contract IToken"
           },
           "t_contract(AggregatorV3Interface)45": {
@@ -394,7 +394,7 @@
           "t_uint256": {
             "label": "uint256"
           },
-          "t_contract(IModel)7323": {
+          "t_contract(IModel)9237": {
             "label": "contract IModel"
           },
           "t_array(t_uint256)50_storage": {

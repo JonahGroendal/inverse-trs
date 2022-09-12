@@ -24,11 +24,6 @@ contract Swap is ISwap, Rates {
     /// @dev Must use 18 decimals
     IToken public underlying;
 
-    // /// @custom:oz-upgrades-unsafe-allow constructor
-    // constructor() {
-    //     _disableInitializers();
-    // }
-
     function initialize(
         address _priceFeed,
         address _model,

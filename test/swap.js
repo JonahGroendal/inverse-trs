@@ -18,8 +18,8 @@ contract("Swap", accounts => {
     beforeEach(async () => {
         swap = await Swap.deployed()
         weth = await MockWETH.deployed()
-        eusd = await Token.at(contractAddrs.EUSD)
-        leth = await Token.at(contractAddrs.LETH)
+        eusd = await Token.at(contractAddrs.fixedLeg)
+        leth = await Token.at(contractAddrs.floatLeg)
         feed = await MockPriceFeed.deployed()
     })
 

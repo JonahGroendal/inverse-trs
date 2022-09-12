@@ -10,7 +10,7 @@
     "test": "truffle test --compile-all",
     "migrate-goerli": "truffle migrate --network goerli",
     "migrate-goerli-dry-run": "truffle migrate --network goerli --dry-run",
-    "verify-goerli": "truffle run verify Swap --network goerli",
+    "verify-goerli": "truffle run verify Swap Token Timelock --network goerli",
     "compile": "truffle compile --all",
     "clean": "truffle networks --clean"
   },

@@ -42,6 +42,11 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
     /// @notice Interest rate model
     IModel public model;
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _priceFeed, address _model) public onlyInitializing {
         __Ownable_init();
         __UUPSUpgradeable_init();

@@ -45,12 +45,10 @@ contract Token is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Acc
         __UUPSUpgradeable_init();
 
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
-        _grantRole(MINTER_ROLE, admin);
-        _grantRole(UPGRADER_ROLE, admin);
     }
 
     function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
-        _mint(to, amount);
+        _mint(to, amount);  
     }
 
     function _authorizeUpgrade(address newImplementation)
