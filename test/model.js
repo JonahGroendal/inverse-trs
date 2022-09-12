@@ -22,6 +22,11 @@ contract('LinearModel', async () => {
         model = await LinearModel.deployed()
     })
 
+    it('should correctly calculate interest rate when balances are 0', async () => {
+        const rate = await model.getInterestRate.call(toWei(0), toWei(0))
+        assert.equal(rate.toString(), '0')
+    })
+
     it('should correctly calculate interest rate when collateral ratio is 1', async () => {
         const rate = await model.getInterestRate.call(toWei(1), toWei(1))
         assert.equal(rate.toString(), expected(1).toString())

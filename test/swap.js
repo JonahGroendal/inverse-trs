@@ -1,5 +1,5 @@
 const fs = require('fs')
-const contractAddrs = JSON.parse(fs.readFileSync('contractAddrsTest.json'))
+const contractAddrs = JSON.parse(fs.readFileSync('contractAddrs-test.json'))
 const BN = web3.utils.BN
 
 const Swap = artifacts.require("Swap")

@@ -23,6 +23,9 @@ contract LinearModel is Model {
     /// @notice M * collateral ratio + B
     /// @dev collateral ratio = pot value / fixed-leg total value
     function f(uint potValue, uint fixedTV) internal override pure returns (int) {
+        if (fixedTV == 0) {
+            return 0;
+        }
         unchecked {
             return ((M * int(potValue)) / int(fixedTV)) + B;
         }
@@ -35,6 +38,9 @@ contract ConstantFloatModel is Model {
     int constant FLOAT_RATE = 4 * ONE / 876582; // 4% APR, compounded hourly
 
     function f(uint potValue, uint fixedTV) internal override pure returns (int) {
+        if (fixedTV == 0) {
+            return 0;
+        }
         unchecked {
             return ((FLOAT_RATE * int(potValue)) / int(fixedTV)) - FLOAT_RATE;
         }

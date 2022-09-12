@@ -70,6 +70,7 @@ module.exports = async function (deployer, network, accounts) {
       fixedLeg: fixedLeg.address,
       floatLeg: floatLeg.address,
       swap: swap.address,
+      timelock: Timelock.address,
     }, undefined, 2))
   }
 };
