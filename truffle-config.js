@@ -19,9 +19,16 @@
  */
 
 // const HDWalletProvider = require('@truffle/hdwallet-provider');
-//
-// const fs = require('fs');
-// const mnemonic = fs.readFileSync(".secret").toString().trim();
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+const fs = require('fs');
+
+const infuraKey = "48899b10645a48e189e345be4be19ece";
+
+let privateKeys;
+try {
+  privateKeys = JSON.parse(fs.readFileSync("keys.json").toString().trim()).private;
+} catch {}
+
 
 module.exports = {
   /**
@@ -35,6 +42,19 @@ module.exports = {
    */
 
   networks: {
+    goerli: {
+      provider: () => new HDWalletProvider({
+        privateKeys,
+        providerOrUrl: `https://goerli.infura.io/v3/${infuraKey}`,
+        addressIndex: 0,
+        numAddresses: 5
+      }),
+      network_id: 5,
+      // gas: 5500000,        // Ropsten has a lower block limit than mainnet
+      // confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
+    },
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
     // You should run a client (like ganache-cli, geth or parity) in a separate terminal
@@ -85,13 +105,13 @@ module.exports = {
     solc: {
       version: "0.8.11",    // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
-      // settings: {          // See the solidity docs for advice about optimization and evmVersion
-      //  optimizer: {
-      //    enabled: false,
-      //    runs: 200
-      //  },
+      settings: {          // See the solidity docs for advice about optimization and evmVersion
+       optimizer: {
+         enabled: true,
+         runs: 200
+       },
       //  evmVersion: "byzantium"
-      // }
+      }
     }
   },
 
@@ -115,4 +135,9 @@ module.exports = {
     //   }
     // }
   // }
+
+  plugins: ['truffle-plugin-verify'],
+  api_keys: {
+    etherscan: 'M1U32EAB8YNJMZYYP93ZTWZJ2T1T2QKQTA'
+  }
 };

@@ -7,7 +7,10 @@
     "test": "test"
   },
   "scripts": {
-    "test": "truffle test",
+    "test": "truffle test --compile-all",
+    "migrate-goerli": "truffle migrate --network goerli",
+    "migrate-goerli-dry-run": "truffle migrate --network goerli --dry-run",
+    "verify-goerli": "truffle run verify Swap --network goerli",
     "compile": "truffle compile --all",
     "clean": "truffle networks --clean"
   },
@@ -34,11 +37,15 @@
   "homepage": "https://github.com/JonahGroendal/volatility-swap#readme",
   "dependencies": {
     "@chainlink/contracts": "^0.4.1",
-    "@openzeppelin/contracts": "^4.4.2",
-    "truffle": "^5.5.0"
+    "@openzeppelin/contracts": "^4.7.3",
+    "@openzeppelin/contracts-upgradeable": "^4.7.3",
+    "@openzeppelin/truffle-upgrades": "^1.16.0",
+    "@truffle/hdwallet-provider": "^2.0.14",
+    "truffle": "^5.5.29"
   },
   "devDependencies": {
     "eth-gas-reporter": "^0.2.24",
-    "openzeppelin-test-helpers": "^0.5.1"
+    "openzeppelin-test-helpers": "^0.5.1",
+    "truffle-plugin-verify": "^0.5.28"
   }
 }

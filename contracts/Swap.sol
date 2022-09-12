@@ -24,6 +24,31 @@ contract Swap is ISwap, Rates {
     /// @dev Must use 18 decimals
     IToken public underlying;
 
+    // /// @custom:oz-upgrades-unsafe-allow constructor
+    // constructor() {
+    //     _disableInitializers();
+    // }
+
+    function initialize(
+        address _priceFeed,
+        address _model,
+        address _fixedLeg,
+        address _floatLeg,
+        address _underlying)
+        public initializer
+    {
+        Rates.initialize(_priceFeed, _model);
+        fixedLeg  = IToken(_fixedLeg);
+        floatLeg  = IToken(_floatLeg);
+        underlying = IToken(_underlying);
+    }
+
+    // function _authorizeUpgrade(address newImplementation)
+    //     internal
+    //     onlyOwner
+    //     override
+    // {}
+/*
     constructor(address _priceFeed, address _model, address _fixedLeg, address _floatLeg, address _underlying)
     Rates(_priceFeed, _model)
     {
@@ -31,7 +56,7 @@ contract Swap is ISwap, Rates {
         floatLeg   = IToken(_floatLeg);
         underlying = IToken(_underlying);
     }
-
+*/
     /// @notice limit TX priority to prevent fruntrunning price oracle updates
     /// @notice Also should delay trades to prevent trading on advanced price knowledge.
     modifier limitedPriority {
