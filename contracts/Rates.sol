@@ -1,13 +1,13 @@
 pragma solidity ^0.8.11;
 
 import "./IRates.sol";
+import "./IPrice.sol";
 import "./IModel.sol";
 import "./Math.sol";
-//import "@openzeppelin/contracts/access/Ownable.sol";
+
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 /// @notice Tracks exchange rate, interest rate, accrewed interest and premiums
 contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
@@ -17,7 +17,7 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
     uint constant ONE_26 = 10**26;
     uint constant COMPOUNDING_PERIOD = 3600;  // 1 hour
 
-    AggregatorV3Interface internal priceFeed;
+    IPrice internal price;
 
     /// @notice Maximum allowed priority fee for trades
     /// @dev Prevents fruntrunning price oracle
@@ -47,14 +47,14 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
         _disableInitializers();
     }
 
-    function initialize(address _priceFeed, address _model) public onlyInitializing {
+    function initialize(address _price, address _model) public onlyInitializing {
         __Ownable_init();
         __UUPSUpgradeable_init();
         maxPriorityFee = 3000000000;
         interest = ONE;
         startTime = (block.timestamp / COMPOUNDING_PERIOD) * COMPOUNDING_PERIOD;
         startValue = ONE_26;
-        setPriceFeed(_priceFeed);
+        setPrice(_price);
         setModel(_model);
     }
 
@@ -79,14 +79,7 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
     /// @return Value of underlying in denominating currency. 
     /// @dev Gets exchange rate from a price feed.
     function underlyingValue() internal view returns (uint) {
-        (
-            /*uint80 roundID*/,
-            int price,
-            /*uint startedAt*/,
-            /*uint timeStamp*/,
-            /*uint80 answeredInRound*/
-        ) = priceFeed.latestRoundData();
-        return uint(price);
+        return price.get();
     }
 
     /// @notice Accrewed interest multiplier. Nominal value of 1 fixedLeg token in denominating currency
@@ -139,8 +132,8 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
         tolerance = _tolerance;
     }
 
-    function setPriceFeed(address _priceFeed) public onlyOwner {
-        priceFeed = AggregatorV3Interface(_priceFeed);
+    function setPrice(address _price) public onlyOwner {
+        price = IPrice(_price);
     }
 
     function setModel(address _model) public onlyOwner {

@@ -15,6 +15,6 @@ interface IRates {
 
     function setMaxPriorityFee(uint _maxPriorityFee) external;
     function setTolerance(uint _tolerance) external;
-    function setPriceFeed(address _priceFeed) external;
+    function setPrice(address _price) external;
     function setModel(address _model) external;
 }

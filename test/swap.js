@@ -5,7 +5,7 @@ const BN = web3.utils.BN
 const Swap = artifacts.require("Swap")
 const MockWETH = artifacts.require("MockWETH")
 const Token = artifacts.require("Token")
-const MockPriceFeed = artifacts.require("MockPriceFeed");
+const MockPrice = artifacts.require("MockPrice");
 
 const toWei = amount => (new BN(amount*10000000000)).mul((new BN(10)).pow(new BN(8)))
 
@@ -20,7 +20,7 @@ contract("Swap", accounts => {
         weth = await MockWETH.deployed()
         eusd = await Token.at(contractAddrs.fixedLeg)
         leth = await Token.at(contractAddrs.floatLeg)
-        feed = await MockPriceFeed.deployed()
+        feed = await MockPrice.deployed()
     })
 
 

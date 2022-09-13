@@ -1,5 +1,5 @@
 const BN = web3.utils.BN
-const MockPriceFeed = artifacts.require("MockPriceFeed")
+const MockPrice = artifacts.require("MockPrice")
 const MockModel = artifacts.require("MockModel")
 const Rates = artifacts.require("Swap")
 const { time } = require('openzeppelin-test-helpers');
@@ -13,7 +13,7 @@ contract("Rates", accounts => {
 
     beforeEach(async () => {
         rates = await Rates.deployed()
-        feed  = await MockPriceFeed.deployed()
+        feed  = await MockPrice.deployed()
         model = await MockModel.deployed()
     })
 
