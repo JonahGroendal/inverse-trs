@@ -57,21 +57,6 @@
       "kind": "uups"
     },
     {
-      "address": "0xAa588d3737B611baFD7bD713445b314BD453a5C8",
-      "txHash": "0xe215cd0bac333cbcd9f4d20302fdb381a7b3997d13cc14103c9df6e46f3af080",
-      "kind": "uups"
-    },
-    {
-      "address": "0xf204a4Ef082f5c04bB89F7D5E6568B796096735a",
-      "txHash": "0xc1aa8942d892e080a3c5aca724b96d7f9356900b3722e2a33129c4e97fa70a33",
-      "kind": "uups"
-    },
-    {
-      "address": "0x82D50AD3C1091866E258Fd0f1a7cC9674609D254",
-      "txHash": "0x3adc63696d5edea4b8606c9fbb8e044a59777321563aa9b305293316f9191d07",
-      "kind": "uups"
-    },
-    {
       "address": "0xe7FD3ee1d1c70c87234ec57C2B036Ad8c0Fd0173",
       "txHash": "0xfd42dfa2e73f0220dcc8c853a19f2e83d3488300fd199134cc6c936d6892fdb2",
       "kind": "uups"
@@ -85,12 +70,27 @@
       "address": "0x748b032161b2070C6DFeEe3a05C622ad61A71900",
       "txHash": "0xb2db724691fcd45a192830f2b4a3379da93ff9bd56b8dc64900de7293f6db93f",
       "kind": "uups"
+    },
+    {
+      "address": "0xAa588d3737B611baFD7bD713445b314BD453a5C8",
+      "txHash": "0xe215cd0bac333cbcd9f4d20302fdb381a7b3997d13cc14103c9df6e46f3af080",
+      "kind": "uups"
+    },
+    {
+      "address": "0xf204a4Ef082f5c04bB89F7D5E6568B796096735a",
+      "txHash": "0xc1aa8942d892e080a3c5aca724b96d7f9356900b3722e2a33129c4e97fa70a33",
+      "kind": "uups"
+    },
+    {
+      "address": "0x82D50AD3C1091866E258Fd0f1a7cC9674609D254",
+      "txHash": "0x95efce8e43a1a6153d49177601b0f171055ad22cd961dd09d2cbe0e8a482f1a5",
+      "kind": "uups"
     }
   ],
   "impls": {
     "ec3f858baf9716179ce65149e2960f881f11a4b8dc6bc806b4361b70142d006e": {
-      "address": "0x8F570bCBfFbC4A8B3Fabbf7996CEc435d8A8425B",
-      "txHash": "0xc371c1c860eedc9535a5055919a96ffa31e42852867ca17fdf482955c2b294c8",
+      "address": "0xFB88dE099e13c3ED21F80a7a1E49f8CAEcF10df6",
+      "txHash": "0x7dde930b70c0be2f05d7f6c0972a00f9ca2d7f64fcc6ec35695e7b33d8f1bc58",
       "layout": {
         "storage": [
           {
@@ -434,6 +434,146 @@
             "label": "model",
             "type": "t_contract(IModel)9237",
             "src": "../project:/contracts/Rates.sol:43"
+          },
+          {
+            "contract": "Swap",
+            "label": "fixedLeg",
+            "type": "t_contract(IToken)9520",
+            "src": "../project:/contracts/Swap.sol:16"
+          },
+          {
+            "contract": "Swap",
+            "label": "floatLeg",
+            "type": "t_contract(IToken)9520",
+            "src": "../project:/contracts/Swap.sol:21"
+          },
+          {
+            "contract": "Swap",
+            "label": "underlying",
+            "type": "t_contract(IToken)9520",
+            "src": "../project:/contracts/Swap.sol:25"
+          }
+        ],
+        "types": {
+          "t_contract(IToken)9520": {
+            "label": "contract IToken"
+          },
+          "t_contract(IPrice)9245": {
+            "label": "contract IPrice"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_contract(IModel)9237": {
+            "label": "contract IModel"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_uint8": {
+            "label": "uint8"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "df6291081af8d0dccaf1d8d2025e5c7df33ddf4d0d2e5fd6045b0dea5fd736f6": {
+      "address": "0x75c35C980C0d37ef46DF04d31A140b65503c0eEd",
+      "txHash": "0xee53369243294106aa3f75d827393a1302fd76bb57c8ad97636cf53fcc6732ab",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_uint8",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "contract": "ERC1967UpgradeUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
+          },
+          {
+            "contract": "UUPSUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
+          },
+          {
+            "contract": "Rates",
+            "label": "price",
+            "type": "t_contract(IPrice)9245",
+            "src": "../project:/contracts/Rates.sol:21"
+          },
+          {
+            "contract": "Rates",
+            "label": "maxPriorityFee",
+            "type": "t_uint256",
+            "src": "../project:/contracts/Rates.sol:25"
+          },
+          {
+            "contract": "Rates",
+            "label": "tolerance",
+            "type": "t_uint256",
+            "src": "../project:/contracts/Rates.sol:30"
+          },
+          {
+            "contract": "Rates",
+            "label": "interest",
+            "type": "t_uint256",
+            "src": "../project:/contracts/Rates.sol:34"
+          },
+          {
+            "contract": "Rates",
+            "label": "startTime",
+            "type": "t_uint256",
+            "src": "../project:/contracts/Rates.sol:38"
+          },
+          {
+            "contract": "Rates",
+            "label": "startValue",
+            "type": "t_uint256",
+            "src": "../project:/contracts/Rates.sol:41"
+          },
+          {
+            "contract": "Rates",
+            "label": "model",
+            "type": "t_contract(IModel)9237",
+            "src": "../project:/contracts/Rates.sol:44"
           },
           {
             "contract": "Swap",

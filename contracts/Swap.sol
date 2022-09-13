@@ -52,6 +52,13 @@ contract Swap is ISwap, Rates {
         underlying = IToken(_underlying);
     }
 */
+
+    event BuyFixed (address indexed buyer,  uint amount, uint value);
+    event SellFixed(address indexed seller, uint amount, uint value);
+    event BuyFloat (address indexed buyer,  uint amount, uint value);
+    event SellFloat(address indexed seller, uint amount, uint value);
+
+
     /// @notice limit TX priority to prevent fruntrunning price oracle updates
     /// @notice Also should delay trades to prevent trading on advanced price knowledge.
     modifier limitedPriority {
@@ -70,6 +77,7 @@ contract Swap is ISwap, Rates {
         );
         fixedLeg.mint(to, amount);
         updateInterest();
+        emit BuyFixed(to, amount, value);
     }
 
     /// @notice Sell out of fixed leg, burning `amount` tokens
@@ -82,6 +90,7 @@ contract Swap is ISwap, Rates {
         );
         fixedLeg.burnFrom(msg.sender, amount);
         updateInterest();
+        emit SellFixed(to, amount, value);
     }
 
     /// @notice Buy into floating leg, minting `amount` tokens
@@ -97,6 +106,7 @@ contract Swap is ISwap, Rates {
         );
         floatLeg.mint(to, amount);
         updateInterest();
+        emit BuyFloat(to, amount, value);
     }
 
     /// @notice Sell out of floating leg, burning `amount` tokens
@@ -111,6 +121,7 @@ contract Swap is ISwap, Rates {
         );
         floatLeg.burnFrom(msg.sender, amount);
         updateInterest();
+        emit SellFloat(to, amount, value);
     }
 
     /// @return Value in underlying of `amount` floatLeg tokens

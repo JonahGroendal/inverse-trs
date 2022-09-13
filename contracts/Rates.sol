@@ -17,6 +17,7 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
     uint constant ONE_26 = 10**26;
     uint constant COMPOUNDING_PERIOD = 3600;  // 1 hour
 
+    /// @notice The price feed
     IPrice internal price;
 
     /// @notice Maximum allowed priority fee for trades
@@ -47,6 +48,11 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
         _disableInitializers();
     }
 
+    event PriceFeedChanged(address indexed priceFeed);
+    event MaxPriorityFeeChanged(uint maxPriorityFee);
+    event ToleranceChanged(uint tolerance);
+    event InterestModelChanged(address indexed model);
+
     function initialize(address _price, address _model) public onlyInitializing {
         __Ownable_init();
         __UUPSUpgradeable_init();
@@ -64,12 +70,6 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
         override
     {}
 
-/*
-    constructor(address _priceFeed, address _model) {
-        setPriceFeed(_priceFeed);
-        setModel(_model);
-    }
-*/
     /// @return Nominal value of 1 underlying token in fixedLeg
     /// @dev underlying exchange rate + accrewed interest
     function fixedValue() public view returns (uint) {
@@ -126,18 +126,22 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     function setMaxPriorityFee(uint _maxPriorityFee) public onlyOwner {
         maxPriorityFee = _maxPriorityFee;
+        emit MaxPriorityFeeChanged(_maxPriorityFee);
     }
 
     function setTolerance(uint _tolerance) public onlyOwner {
         tolerance = _tolerance;
+        emit ToleranceChanged(_tolerance);
     }
 
     function setPrice(address _price) public onlyOwner {
         price = IPrice(_price);
+        emit PriceFeedChanged(_price);
     }
 
     function setModel(address _model) public onlyOwner {
         model = IModel(_model);
+        emit InterestModelChanged(_model);
     }
 
     /// @notice Update interest rate according to model
