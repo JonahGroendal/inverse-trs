@@ -5,7 +5,7 @@ interface IRates {
     function maxPriorityFee() external view returns (uint);
     function tolerance() external view returns (uint);
 
-    function fixedValue() external view returns (uint);
+    function fixedValueNominal(uint amount) external view returns (uint);
     function accIntMul() external view returns (uint);
 
     function fixedBuyPremium(uint value) external view returns (uint);

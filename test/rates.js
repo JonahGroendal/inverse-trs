@@ -47,7 +47,7 @@ contract("Rates", accounts => {
     it("should correctly calculate accrewed interest after 3 hours", async () => {
         await time.increase(time.duration.seconds(3600*10.2));
         await model.setInterest(new BN("0000022815890000000")) // .2/8765.82
-        await rates.updateInterest()
+        await rates.updateInterestRate()
         await time.increase(time.duration.seconds(3600*3));
         const multiplier = await rates.accIntMul.call()
 
@@ -56,7 +56,7 @@ contract("Rates", accounts => {
 
     it("should correctly calculate accrewed interest after 20 hours after it's changed", async () => {
         await model.setInterest(new BN("0000003422383758735")) // .03/8765.82
-        await rates.updateInterest()
+        await rates.updateInterestRate()
         await time.increase(time.duration.seconds(3600*20));
         const multiplier = await rates.accIntMul.call()
 
@@ -65,9 +65,9 @@ contract("Rates", accounts => {
 
     it("should correctly calculate fixed value at the current interest rate", async () => {
         await feed.setPrice(toWei(1000));
-        const rate = await rates.fixedValue.call();
+        const rate = await rates.fixedValueNominal(toWei(1));
         const multiplier = await rates.accIntMul.call()
-        const expected = toWei(1000).mul((new BN(10)).pow(new BN(26))).div(multiplier)
+        const expected = multiplier.mul(new BN('10000000000')).div(toWei(1000))
 
         assert.equal(rate.toString(), expected.toString())
     })

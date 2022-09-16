@@ -61,6 +61,7 @@ contract Swap is ISwap, Rates {
 
     /// @notice limit TX priority to prevent fruntrunning price oracle updates
     /// @notice Also should delay trades to prevent trading on advanced price knowledge.
+    /// @dev A selfish block producer could defeat this protection
     modifier limitedPriority {
         require(tx.gasprice - block.basefee <= maxPriorityFee, "Priority fee too high");
         _;
@@ -68,105 +69,119 @@ contract Swap is ISwap, Rates {
 
     /// @notice Buy into fixed leg, minting `amount` tokens
     function buyFixed(uint amount, address to) public limitedPriority {
-        uint value = fixedValue(amount);
+        uint potValue = _potValue();
+        uint _accIntMul = accIntMul();
+        (uint value, uint tv) = _fixedValue(amount, potValue, _accIntMul);
         require(value > 0, "Zero value trade");
-        underlying.transferFrom(
-            msg.sender,
-            address(this),
-            value + fixedBuyPremium(value)
-        );
+        uint cost = value + fixedBuyPremium(value);
+        underlying.transferFrom(msg.sender, address(this), cost);
         fixedLeg.mint(to, amount);
-        updateInterest();
+        _updateInterest(potValue + cost, tv, _accIntMul);
         emit BuyFixed(to, amount, value);
     }
 
     /// @notice Sell out of fixed leg, burning `amount` tokens
     function sellFixed(uint amount, address to) public limitedPriority {
-        uint value = fixedValue(amount);
+        uint potValue = _potValue();
+        uint _accIntMul = accIntMul();
+        (uint value, uint tv) = _fixedValue(amount, potValue, _accIntMul);
         require(value > 0, "Zero value trade");
-        underlying.transfer(
-            to,
-            value - fixedSellPremium(value)
-        );
+        uint cost = value - fixedSellPremium(value);
+        underlying.transfer(to, cost);
         fixedLeg.burnFrom(msg.sender, amount);
-        updateInterest();
+        _updateInterest(potValue - cost, tv, _accIntMul);
         emit SellFixed(to, amount, value);
     }
 
     /// @notice Buy into floating leg, minting `amount` tokens
     function buyFloat(uint amount, address to) public limitedPriority {
-        uint fixedTV = fixedTV(fixedValue());
-        uint floatTV = floatTV(fixedTV);
-        uint value   = floatValue(amount, floatTV);
+        uint potValue = _potValue();
+        uint _accIntMul = accIntMul();
+        uint fixedTV = _fixedTV(potValue, _accIntMul);
+        uint floatTV = potValue - fixedTV;
+        uint value = _floatValue(amount, floatTV);
         require(value > 0, "Zero value trade");
-        underlying.transferFrom(
-            msg.sender,
-            address(this),
-            value + floatBuyPremium(value, fixedTV, floatTV)
-        );
+        uint cost = value + floatBuyPremium(value, fixedTV, floatTV);
+        underlying.transferFrom(msg.sender, address(this), cost);
         floatLeg.mint(to, amount);
-        updateInterest();
+        _updateInterest(potValue + cost, fixedTV, _accIntMul);
         emit BuyFloat(to, amount, value);
     }
 
     /// @notice Sell out of floating leg, burning `amount` tokens
     function sellFloat(uint amount, address to) public limitedPriority {
-        uint fixedTV = fixedTV(fixedValue());
-        uint floatTV = floatTV(fixedTV);
-        uint value   = floatValue(amount, floatTV);
+        uint potValue = _potValue();
+        uint _accIntMul = accIntMul();
+        uint fixedTV = _fixedTV(potValue, _accIntMul);
+        uint floatTV = potValue - fixedTV;
+        uint value = _floatValue(amount, floatTV);
         require(value > 0, "Zero value trade");
-        underlying.transfer(
-            to,
-            value - floatSellPremium(value, fixedTV, floatTV)
-        );
+        uint cost = value - floatSellPremium(value, fixedTV, floatTV);
+        underlying.transfer(to, cost);
         floatLeg.burnFrom(msg.sender, amount);
-        updateInterest();
+        _updateInterest(potValue - cost, fixedTV, _accIntMul);
         emit SellFloat(to, amount, value);
     }
 
-    /// @return Value in underlying of `amount` floatLeg tokens
+    /// @notice Value in underlying of `amount` fixedLeg tokens
     /// @dev By passing in `amount` we can multiply before dividing, saving precision
-    /// @dev Require minimum total value to prevent totalSupply overflow
-    function floatValue(uint amount, uint totalValue) public view returns (uint) {
-        if (floatLeg.totalSupply() == 0) {
-            return amount;
-        }
-        require(totalValue > MIN_FLOAT_TV, "Protecting against potential totalSupply overflow");
-        return amount*totalValue/floatLeg.totalSupply();
+    function fixedValue(uint amount) public view returns (uint value, uint totalValue) {
+        uint _accIntMul = accIntMul();
+        return _fixedValue(amount, _potValue(), _accIntMul);
     }
 
-    /// @return Value in underlying of all floatLeg tokens
-    function floatTV(uint _fixedTV) public view returns (uint) {
-        uint _potValue = potValue();
-        if (_potValue > _fixedTV) {
-            return _potValue - _fixedTV;
-        }
-        return 0;
-    }
-
-    /// @return Value in underlying of `amount` fixedLeg tokens
-    function fixedValue(uint amount) public view returns (uint) {
-        uint value = fixedValue();
-        uint totalValue = fixedTV(value);
-        uint _potValue = potValue();
-        if (_potValue < totalValue)
-            return amount*_potValue/fixedLeg.totalSupply();
-        return amount*ONE/value;
-    }
-
-    /// @return Nominal value in underlying of all fixedLeg tokens
-    /// @param value Nominal value in underlying of 1 fixedLeg token
-    function fixedTV(uint value) public view returns (uint) {
-        return fixedLeg.totalSupply()*ONE/value;
-    }
-
-    function potValue() public view returns (uint) {
-        return underlying.balanceOf(address(this));
+    /// @notice Value in underlying ofixedLeg.totalSupply(),f `amount` floatLeg tokens
+    /// @dev By passing in `amount` we can multiply before dividing, saving precision
+    function floatValue(uint amount) public view returns (uint) {
+        uint potValue = _potValue();
+        uint _accIntMul = accIntMul();
+        return _floatValue(amount, potValue - _fixedTV(potValue, _accIntMul));
     }
 
     /// @dev Always called after a buy or sell but can be called by anyone at any time
     /// @dev Would behoove some stakeholders to call this after a price change
-    function updateInterest() public {
-        _updateInterest(potValue(), fixedTV(fixedValue()));
+    function updateInterestRate() public {
+        uint potValue = _potValue();
+        uint _accIntMul = accIntMul();
+        _updateInterest(potValue, _fixedTV(potValue, _accIntMul), _accIntMul);
+    }
+
+    function _floatValue(uint amount, uint totalValue) internal view returns (uint) {
+        uint floatSupply = floatLeg.totalSupply();
+        if (floatSupply == 0) {
+            return amount;
+        }
+        //require(totalValue > MIN_FLOAT_TV, "Protecting against potential totalSupply overflow");
+        return amount*totalValue/floatSupply;
+    }
+/*
+    /// @return Value in underlying of all floatLeg tokens
+    function floatTV(uint _fixedTV, uint _potValue) public view returns (uint) {
+        return _potValue - _fixedTV;
+    }
+*/
+
+    function _fixedValue(uint amount, uint potValue, uint _accIntMul) internal view returns (uint value, uint totalValue) {
+        uint underlyingPrice = _underlyingPrice();
+        uint supply = fixedLeg.totalSupply();
+        uint nomValue = _fixedValueNominal(amount, _accIntMul, underlyingPrice);
+        uint nomTV    = _fixedValueNominal(supply, _accIntMul, underlyingPrice);
+        if (potValue < nomTV)
+            return (amount*potValue/supply, potValue);
+        return (nomValue, nomTV);
+    }
+
+    /// @notice Nominal value in underlying of all fixedLeg tokens
+    function _fixedTV(uint potValue, uint _accIntMul) internal view returns (uint) {
+        uint supply = fixedLeg.totalSupply();
+        uint underlyingPrice = _underlyingPrice();
+        uint nomValue = _fixedValueNominal(supply, _accIntMul, underlyingPrice);
+        if (potValue < nomValue)
+            return potValue;
+        return nomValue;
+    }
+
+    function _potValue() internal view returns (uint) {
+        return underlying.balanceOf(address(this));
     }
 }

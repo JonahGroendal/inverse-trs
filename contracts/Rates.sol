@@ -15,9 +15,10 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     uint constant ONE    = 10**18;
     uint constant ONE_26 = 10**26;
+    uint constant ONE_8 = 10**8;
     uint constant COMPOUNDING_PERIOD = 3600;  // 1 hour
 
-    /// @notice The price feed
+    /// @notice Price of underlying in target asset
     IPrice internal price;
 
     /// @notice Maximum allowed priority fee for trades
@@ -64,29 +65,19 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
         setModel(_model);
     }
 
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        onlyOwner
-        override
-    {}
-
-    /// @return Nominal value of 1 underlying token in fixedLeg
+    /// @notice Nominal value of 1 fixedLeg token in underlying
     /// @dev underlying exchange rate + accrewed interest
-    function fixedValue() public view returns (uint) {
-        return underlyingValue() * ONE_26 / accIntMul();
-    }
-
-    /// @return Value of underlying in denominating currency. 
-    /// @dev Gets exchange rate from a price feed.
-    function underlyingValue() internal view returns (uint) {
-        return price.get();
+    function fixedValueNominal(uint amount) public view returns (uint) {
+        //return underlyingPrice() * ONE_26 / accIntMul();
+        //return accIntMul() * ONE_10 / underlyingPrice();
+        return _fixedValueNominal(amount, accIntMul(), _underlyingPrice());
     }
 
     /// @notice Accrewed interest multiplier. Nominal value of 1 fixedLeg token in denominating currency
     /// @return Target currency-fixed exchange rate, expressed as denominating currency per fixed. 26-decimal fixed-point 
     function accIntMul() public view returns (uint) {
         unchecked {
-            return startValue * (interest*100000000).pow((block.timestamp - startTime) / COMPOUNDING_PERIOD) / ONE_26;
+            return startValue * (interest*ONE_8).pow((block.timestamp - startTime) / COMPOUNDING_PERIOD) / ONE_26;
         }
     }
 
@@ -98,7 +89,7 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     /// @return Fee required to sell `amount` fixedLeg tokens
     /// @param value Value of trade in underlying
-    function fixedSellPremium(uint value) public view returns (uint) {
+    function fixedSellPremium(uint value) public view returns (uint) { // remove this and just use fixedBuyPremium with a negative value
         return value - (value * ONE / (ONE + tolerance));
     }
 
@@ -107,7 +98,7 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
     /// @param fixedTotalValue Value in underlying of all fixedLeg tokens
     /// @param floatTotalValue Value in underlying of all floatLeg tokens
     function floatBuyPremium(uint value, uint fixedTotalValue, uint floatTotalValue) public view returns (uint) {
-        if (floatTotalValue == 0) {
+        if (floatTotalValue <= 0) {
             return 0;
         }
         return (value - (value * ONE / (ONE + tolerance))) * fixedTotalValue / floatTotalValue;
@@ -118,7 +109,7 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
     /// @param fixedTotalValue Value in underlying of all fixedLeg tokens
     /// @param floatTotalValue Value in underlying of all floatLeg tokens
     function floatSellPremium(uint value, uint fixedTotalValue, uint floatTotalValue) public view returns (uint) {
-        if (floatTotalValue == 0) {
+        if (floatTotalValue <= 0) {
             return 0;
         }
         return ((value * ONE / (ONE - tolerance)) - value) * fixedTotalValue / floatTotalValue;
@@ -144,19 +135,35 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit InterestModelChanged(_model);
     }
 
+    function _fixedValueNominal(uint amount, uint _accIntMul, uint underlyingPrice) internal pure returns (uint) {
+        return amount * (_accIntMul / ONE_8) / underlyingPrice;
+    }
+
+    /// @return Value of underlying in denominating currency. 
+    /// @dev Gets exchange rate from a price feed.
+    function _underlyingPrice() internal view returns (uint) {
+        return price.get();
+    }
+
     /// @notice Update interest rate according to model
-    function _updateInterest(uint potValue, uint fixedTV) internal {
+    function _updateInterest(uint potValue, uint fixedTV, uint _accIntMul) internal {
         uint newRate = uint(int(ONE) + model.getInterestRate(potValue, fixedTV));
         if (newRate != interest) {
-            _setInterest(newRate);
+            _setInterest(newRate, _accIntMul);
         }
     }
 
     /// @notice Change the hourly interest rate. May represent a negative rate.
     /// @param _interest 18-decimal fixed-point. 1 + hourly interest rate.
-    function _setInterest(uint _interest) internal {
-        startValue = accIntMul();
+    function _setInterest(uint _interest, uint _accIntMul) internal {
+        startValue = _accIntMul;//accIntMul();
         startTime = startTime + (((block.timestamp - startTime) / COMPOUNDING_PERIOD) * COMPOUNDING_PERIOD);
         interest = _interest;
     }
+
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        onlyOwner
+        override
+    {}
 }
