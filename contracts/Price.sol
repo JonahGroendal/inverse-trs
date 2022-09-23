@@ -3,7 +3,7 @@ pragma solidity ^0.8.11;
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 contract Price8Decimal {
-    AggregatorV3Interface private feed;
+    AggregatorV3Interface immutable feed;
 
     constructor(address _feed) {
         feed = AggregatorV3Interface(_feed);
