@@ -181,6 +181,7 @@ cons:
 
 
 # TODO
+- subtract the cost of gas from the premium so small transactions aren't disencentivized
 - look into using super cheap exp() function
 - consolidate premium rates functions
 - make sure not vulnerable to erc 777 reentry

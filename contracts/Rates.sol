@@ -18,21 +18,20 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
     uint constant ONE_8 = 10**8;
     uint constant COMPOUNDING_PERIOD = 3600;  // 1 hour
 
-    /// @notice Price of underlying in target asset
-    IPrice internal price;
-
-    /// @notice Maximum allowed priority fee for trades
-    /// @dev Prevents fruntrunning price oracle
-    uint public maxPriorityFee;
-
-    /// @notice Amount the price feed can safely deviate from the actual exchange rate due to latency
-    /// @dev Used to calculate buy/sell premiums.
-    /// @dev 18-decimal fixed-point percentage
-    uint public tolerance;
+    /// @notice Fee rate applied to notional value of trade.
+    /// @notice Prevents soft frontrunning.
+    /// @dev 18-decimal fixed-point
+    uint public fee;
 
     /// @notice 1 + hourly interest rate. Rate can be negative
     /// @dev 18-decimal fixed-point
     uint public interest;
+
+    /// @notice Interest rate model
+    IModel public model;
+
+    /// @notice Price of underlying in target asset
+    IPrice internal price;
 
     /// @notice Timestamp of when interest began accrewing
     /// @dev start at a perfect multiple of COMPOUNDING_PERIOD so all contracts are syncronized
@@ -41,9 +40,6 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
     /// @notice Value of accumulated interest multiplier when interest began accrewing
     uint internal startValue;
 
-    /// @notice Interest rate model
-    IModel public model;
-
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -51,13 +47,12 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     event PriceFeedChanged(address indexed priceFeed);
     event MaxPriorityFeeChanged(uint maxPriorityFee);
-    event ToleranceChanged(uint tolerance);
+    event FeeChanged(uint tolerance);
     event InterestModelChanged(address indexed model);
 
     function initialize(address _price, address _model) public onlyInitializing {
         __Ownable_init();
         __UUPSUpgradeable_init();
-        maxPriorityFee = 3000000000;
         interest = ONE;
         startTime = (block.timestamp / COMPOUNDING_PERIOD) * COMPOUNDING_PERIOD;
         startValue = ONE_26;
@@ -81,48 +76,9 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
         }
     }
 
-    /// @return Fee required to buy `amount` fixedLeg tokens
-    /// @param value Value of trade in underlying
-    function fixedBuyPremium(uint value) public view returns (uint) {
-        return (value * ONE / (ONE - tolerance)) - value;
-    }
-
-    /// @return Fee required to sell `amount` fixedLeg tokens
-    /// @param value Value of trade in underlying
-    function fixedSellPremium(uint value) public view returns (uint) { // remove this and just use fixedBuyPremium with a negative value
-        return value - (value * ONE / (ONE + tolerance));
-    }
-
-    /// @return Fee required to buy `amount` floatLeg tokens
-    /// @param value Value of trade in underlying
-    /// @param fixedTotalValue Value in underlying of all fixedLeg tokens
-    /// @param floatTotalValue Value in underlying of all floatLeg tokens
-    function floatBuyPremium(uint value, uint fixedTotalValue, uint floatTotalValue) public view returns (uint) {
-        if (floatTotalValue <= 0) {
-            return 0;
-        }
-        return (value - (value * ONE / (ONE + tolerance))) * fixedTotalValue / floatTotalValue;
-    }
-
-    /// @return Fee required to sell `amount` floatLeg tokens
-    /// @param value Value of trade in underlying
-    /// @param fixedTotalValue Value in underlying of all fixedLeg tokens
-    /// @param floatTotalValue Value in underlying of all floatLeg tokens
-    function floatSellPremium(uint value, uint fixedTotalValue, uint floatTotalValue) public view returns (uint) {
-        if (floatTotalValue <= 0) {
-            return 0;
-        }
-        return ((value * ONE / (ONE - tolerance)) - value) * fixedTotalValue / floatTotalValue;
-    }
-
-    function setMaxPriorityFee(uint _maxPriorityFee) public onlyOwner {
-        maxPriorityFee = _maxPriorityFee;
-        emit MaxPriorityFeeChanged(_maxPriorityFee);
-    }
-
-    function setTolerance(uint _tolerance) public onlyOwner {
-        tolerance = _tolerance;
-        emit ToleranceChanged(_tolerance);
+    function setFee(uint _fee) public onlyOwner {
+        fee = _fee;
+        emit FeeChanged(_fee);
     }
 
     function setPrice(address _price) public onlyOwner {
@@ -156,7 +112,7 @@ contract Rates is IRates, Initializable, OwnableUpgradeable, UUPSUpgradeable {
     /// @notice Change the hourly interest rate. May represent a negative rate.
     /// @param _interest 18-decimal fixed-point. 1 + hourly interest rate.
     function _setInterest(uint _interest, uint _accIntMul) internal {
-        startValue = _accIntMul;//accIntMul();
+        startValue = _accIntMul;
         startTime = startTime + (((block.timestamp - startTime) / COMPOUNDING_PERIOD) * COMPOUNDING_PERIOD);
         interest = _interest;
     }

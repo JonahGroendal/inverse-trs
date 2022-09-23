@@ -83,7 +83,7 @@
     },
     {
       "address": "0x82D50AD3C1091866E258Fd0f1a7cC9674609D254",
-      "txHash": "0x95efce8e43a1a6153d49177601b0f171055ad22cd961dd09d2cbe0e8a482f1a5",
+      "txHash": "0x0e86054bfa506da31a00d83825491f0bbc9f1fd624fd70095d407f538c4db1fd",
       "kind": "uups"
     }
   ],
@@ -485,9 +485,9 @@
         }
       }
     },
-    "369a23fc4d42a3cfab4d793391d4cc292c3dcd1808c060d1212e134072f9cfb5": {
+    "ae04f5b4b3fd1da58e361903ccf516e586451c6f9ac5a35837deaf58229ab75d": {
       "address": "0x75c35C980C0d37ef46DF04d31A140b65503c0eEd",
-      "txHash": "0x02f538627f216f44293f21990292f388197f1122d96531edd69303765bda15dd",
+      "txHash": "0xd5c36e1cf6a55608237e8cc9bed979458507129392aa04ec66193786e5a33692",
       "layout": {
         "storage": [
           {
@@ -535,77 +535,71 @@
           },
           {
             "contract": "Rates",
-            "label": "price",
-            "type": "t_contract(IPrice)9245",
-            "src": "../project:/contracts/Rates.sol:22"
-          },
-          {
-            "contract": "Rates",
-            "label": "maxPriorityFee",
+            "label": "fee",
             "type": "t_uint256",
-            "src": "../project:/contracts/Rates.sol:26"
-          },
-          {
-            "contract": "Rates",
-            "label": "tolerance",
-            "type": "t_uint256",
-            "src": "../project:/contracts/Rates.sol:31"
+            "src": "../project:/contracts/Rates.sol:24"
           },
           {
             "contract": "Rates",
             "label": "interest",
             "type": "t_uint256",
-            "src": "../project:/contracts/Rates.sol:35"
-          },
-          {
-            "contract": "Rates",
-            "label": "startTime",
-            "type": "t_uint256",
-            "src": "../project:/contracts/Rates.sol:39"
-          },
-          {
-            "contract": "Rates",
-            "label": "startValue",
-            "type": "t_uint256",
-            "src": "../project:/contracts/Rates.sol:42"
+            "src": "../project:/contracts/Rates.sol:28"
           },
           {
             "contract": "Rates",
             "label": "model",
             "type": "t_contract(IModel)9237",
-            "src": "../project:/contracts/Rates.sol:45"
+            "src": "../project:/contracts/Rates.sol:31"
+          },
+          {
+            "contract": "Rates",
+            "label": "price",
+            "type": "t_contract(IPrice)9245",
+            "src": "../project:/contracts/Rates.sol:34"
+          },
+          {
+            "contract": "Rates",
+            "label": "startTime",
+            "type": "t_uint256",
+            "src": "../project:/contracts/Rates.sol:38"
+          },
+          {
+            "contract": "Rates",
+            "label": "startValue",
+            "type": "t_uint256",
+            "src": "../project:/contracts/Rates.sol:41"
           },
           {
             "contract": "Swap",
             "label": "fixedLeg",
-            "type": "t_contract(IToken)9503",
+            "type": "t_contract(IToken)9457",
             "src": "../project:/contracts/Swap.sol:16"
           },
           {
             "contract": "Swap",
             "label": "floatLeg",
-            "type": "t_contract(IToken)9503",
+            "type": "t_contract(IToken)9457",
             "src": "../project:/contracts/Swap.sol:21"
           },
           {
             "contract": "Swap",
             "label": "underlying",
-            "type": "t_contract(IToken)9503",
+            "type": "t_contract(IToken)9457",
             "src": "../project:/contracts/Swap.sol:25"
           }
         ],
         "types": {
-          "t_contract(IToken)9503": {
+          "t_contract(IToken)9457": {
             "label": "contract IToken"
-          },
-          "t_contract(IPrice)9245": {
-            "label": "contract IPrice"
           },
           "t_uint256": {
             "label": "uint256"
           },
           "t_contract(IModel)9237": {
             "label": "contract IModel"
+          },
+          "t_contract(IPrice)9245": {
+            "label": "contract IPrice"
           },
           "t_array(t_uint256)50_storage": {
             "label": "uint256[50]"

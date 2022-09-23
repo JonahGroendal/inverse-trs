@@ -58,68 +58,63 @@ contract Swap is ISwap, Rates {
     event BuyFloat (address indexed buyer,  uint amount, uint value);
     event SellFloat(address indexed seller, uint amount, uint value);
 
-
-    /// @notice limit TX priority to prevent fruntrunning price oracle updates
-    /// @notice Also should delay trades to prevent trading on advanced price knowledge.
-    /// @dev A selfish block producer could defeat this protection
-    modifier limitedPriority {
-        require(tx.gasprice - block.basefee <= maxPriorityFee, "Priority fee too high");
-        _;
-    }
-
     /// @notice Buy into fixed leg, minting `amount` tokens
-    function buyFixed(uint amount, address to) public limitedPriority {
+    function buyFixed(uint amount, address to) public {
         uint potValue = _potValue();
         uint _accIntMul = accIntMul();
         (uint value, uint tv) = _fixedValue(amount, potValue, _accIntMul);
         require(value > 0, "Zero value trade");
-        uint cost = value + fixedBuyPremium(value);
-        underlying.transferFrom(msg.sender, address(this), cost);
+        value += value * fee / ONE;
+        underlying.transferFrom(msg.sender, address(this), value);
         fixedLeg.mint(to, amount);
-        _updateInterest(potValue + cost, tv, _accIntMul);
+        _updateInterest(potValue + value, tv, _accIntMul);
         emit BuyFixed(to, amount, value);
     }
 
     /// @notice Sell out of fixed leg, burning `amount` tokens
-    function sellFixed(uint amount, address to) public limitedPriority {
+    function sellFixed(uint amount, address to) public {
         uint potValue = _potValue();
         uint _accIntMul = accIntMul();
         (uint value, uint tv) = _fixedValue(amount, potValue, _accIntMul);
         require(value > 0, "Zero value trade");
-        uint cost = value - fixedSellPremium(value);
-        underlying.transfer(to, cost);
+        value -= value * fee / ONE;
+        underlying.transfer(to, value);
         fixedLeg.burnFrom(msg.sender, amount);
-        _updateInterest(potValue - cost, tv, _accIntMul);
+        _updateInterest(potValue - value, tv, _accIntMul);
         emit SellFixed(to, amount, value);
     }
 
     /// @notice Buy into floating leg, minting `amount` tokens
-    function buyFloat(uint amount, address to) public limitedPriority {
+    function buyFloat(uint amount, address to) public {
         uint potValue = _potValue();
         uint _accIntMul = accIntMul();
         uint fixedTV = _fixedTV(potValue, _accIntMul);
         uint floatTV = potValue - fixedTV;
         uint value = _floatValue(amount, floatTV);
         require(value > 0, "Zero value trade");
-        uint cost = value + floatBuyPremium(value, fixedTV, floatTV);
-        underlying.transferFrom(msg.sender, address(this), cost);
+        if (floatTV > 0) {
+            value += (value * fee / ONE) * fixedTV / floatTV;
+        }
+        underlying.transferFrom(msg.sender, address(this), value);
         floatLeg.mint(to, amount);
-        _updateInterest(potValue + cost, fixedTV, _accIntMul);
+        _updateInterest(potValue + value, fixedTV, _accIntMul);
         emit BuyFloat(to, amount, value);
     }
 
     /// @notice Sell out of floating leg, burning `amount` tokens
-    function sellFloat(uint amount, address to) public limitedPriority {
+    function sellFloat(uint amount, address to) public {
         uint potValue = _potValue();
         uint _accIntMul = accIntMul();
         uint fixedTV = _fixedTV(potValue, _accIntMul);
         uint floatTV = potValue - fixedTV;
         uint value = _floatValue(amount, floatTV);
         require(value > 0, "Zero value trade");
-        uint cost = value - floatSellPremium(value, fixedTV, floatTV);
-        underlying.transfer(to, cost);
+        if (floatTV > 0) {
+            value -= (value * fee / ONE) * fixedTV / floatTV;
+        }
+        underlying.transfer(to, value);
         floatLeg.burnFrom(msg.sender, amount);
-        _updateInterest(potValue - cost, fixedTV, _accIntMul);
+        _updateInterest(potValue - value, fixedTV, _accIntMul);
         emit SellFloat(to, amount, value);
     }
 
