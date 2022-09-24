@@ -3,6 +3,8 @@ const { deployProxy } = require('@openzeppelin/truffle-upgrades')
 const Migrations = artifacts.require("Migrations")
 const Token = artifacts.require("Token")
 const Swap = artifacts.require("Swap")
+const Parameters = artifacts.require("Parameters")
+const MockParameters = artifacts.require("MockParameters")
 const LinearModel = artifacts.require("LinearModel")
 const Price8Decimal = artifacts.require("Price8Decimal")
 const Timelock = artifacts.require("Timelock")
@@ -24,9 +26,10 @@ const addrs = {
 
 module.exports = async function (deployer, network, accounts) {
   const isNetwork = networks => (networks.includes(network))
+  const isTest = isNetwork(['test', 'development'])
 
   if (isNetwork(['test', 'development', 'goerli', 'goerli-fork'])) {
-    if (isNetwork(['test', 'development'])) {
+    if (isTest) {
       await deployer.deploy(MockMath)
       await deployer.deploy(MockPrice)
       await deployer.deploy(MockModel)
@@ -47,7 +50,7 @@ module.exports = async function (deployer, network, accounts) {
     let priceAddr
     let modelAddr
     let wethAddr
-    if (isNetwork(['test', 'development'])) {
+    if (isTest) {
       priceAddr = MockPrice.address
       modelAddr = MockModel.address
       wethAddr = MockWETH.address
@@ -56,7 +59,8 @@ module.exports = async function (deployer, network, accounts) {
       modelAddr = LinearModel.address
       wethAddr = addrs[network].weth
     }
-    const swap = await deployProxy(Swap, [priceAddr, modelAddr, fixedLeg.address, floatLeg.address, wethAddr], { deployer, kind: "uups" })
+    const params = await deployer.deploy(isTest ? MockParameters : Parameters, '0', modelAddr, priceAddr, fixedLeg.address, floatLeg.address, wethAddr)
+    const swap = await deployProxy(Swap, [params.address], { deployer, kind: "uups" })
 
     await fixedLeg.grantRole(await fixedLeg.MINTER_ROLE.call(), swap.address)
     await floatLeg.grantRole(await floatLeg.MINTER_ROLE.call(), swap.address)
@@ -65,7 +69,7 @@ module.exports = async function (deployer, network, accounts) {
     await floatLeg.revokeRole(await floatLeg.DEFAULT_ADMIN_ROLE.call(), accounts[0])
     await fixedLeg.revokeRole(await fixedLeg.DEFAULT_ADMIN_ROLE.call(), accounts[0])
 
-    if (!isNetwork(['test', 'development'])) {
+    if (!isTest) {
       await swap.transferOwnership(Timelock.address)
     }
 

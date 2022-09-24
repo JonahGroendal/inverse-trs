@@ -2,11 +2,6 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0xdDA6327139485221633A1FcD65f4aC932E60A2e1",
-      "txHash": "0x347b144eabd33395d95d72186fc19b46b2182a26a5945e546183d89dca646213",
-      "kind": "uups"
-    },
-    {
       "address": "0xc16c9e6968a4AeDAFe05402eb176522B78bd4f77",
       "txHash": "0x1b0166565dd193c6d4c4f0bd85d6cadb3d19cedf964c29289247553b632e63ef",
       "kind": "uups"
@@ -72,6 +67,11 @@
       "kind": "uups"
     },
     {
+      "address": "0x82D50AD3C1091866E258Fd0f1a7cC9674609D254",
+      "txHash": "0x0e86054bfa506da31a00d83825491f0bbc9f1fd624fd70095d407f538c4db1fd",
+      "kind": "uups"
+    },
+    {
       "address": "0xAa588d3737B611baFD7bD713445b314BD453a5C8",
       "txHash": "0xe215cd0bac333cbcd9f4d20302fdb381a7b3997d13cc14103c9df6e46f3af080",
       "kind": "uups"
@@ -82,8 +82,8 @@
       "kind": "uups"
     },
     {
-      "address": "0x82D50AD3C1091866E258Fd0f1a7cC9674609D254",
-      "txHash": "0x0e86054bfa506da31a00d83825491f0bbc9f1fd624fd70095d407f538c4db1fd",
+      "address": "0xdDA6327139485221633A1FcD65f4aC932E60A2e1",
+      "txHash": "0x66d2e1a034466aaffe4a9e7514ac9495a8f7d58dc83b0d3c9d7e50ff326d4853",
       "kind": "uups"
     }
   ],
@@ -600,6 +600,104 @@
           },
           "t_contract(IPrice)9245": {
             "label": "contract IPrice"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_uint8": {
+            "label": "uint8"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "1ec317e9efcb9aad823c47e4bbcbf03fc43682300cde2984f53fdd1057ad8dc3": {
+      "address": "0x82D50AD3C1091866E258Fd0f1a7cC9674609D254",
+      "txHash": "0x2c7d641ee4c20013e1ef55a229b13b0573bdfa8bc808cc6c8755a978abafbf18",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_uint8",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "contract": "ERC1967UpgradeUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
+          },
+          {
+            "contract": "UUPSUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
+          },
+          {
+            "contract": "Rates",
+            "label": "params",
+            "type": "t_contract(IParameters)9264",
+            "src": "../project:/contracts/Rates.sol:23"
+          },
+          {
+            "contract": "Rates",
+            "label": "interest",
+            "type": "t_uint256",
+            "src": "../project:/contracts/Rates.sol:27"
+          },
+          {
+            "contract": "Rates",
+            "label": "startTime",
+            "type": "t_uint256",
+            "src": "../project:/contracts/Rates.sol:31"
+          },
+          {
+            "contract": "Rates",
+            "label": "startValue",
+            "type": "t_uint256",
+            "src": "../project:/contracts/Rates.sol:34"
+          }
+        ],
+        "types": {
+          "t_contract(IParameters)9264": {
+            "label": "contract IParameters"
+          },
+          "t_uint256": {
+            "label": "uint256"
           },
           "t_array(t_uint256)50_storage": {
             "label": "uint256[50]"
