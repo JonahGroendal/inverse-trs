@@ -6,5 +6,5 @@ import "./IModel.sol";
 import "./IToken.sol";
 
 interface IParameters {
-    function all() external view returns (uint, IModel, IPrice, IToken, IToken, IToken);
+    function get() external view returns (uint, IModel, IPrice, IToken, IToken, IToken);
 }

@@ -44,7 +44,7 @@ contract Parameters is IParameters {
         underlying = _underlying;
     }
 
-    function all() public view returns (uint, IModel, IPrice, IToken, IToken, IToken) {
+    function get() public view returns (uint, IModel, IPrice, IToken, IToken, IToken) {
         return (fee, model, price, fixedLeg, floatLeg, underlying);
     }
 }
