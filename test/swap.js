@@ -1,5 +1,5 @@
 const fs = require('fs')
-const contractAddrs = JSON.parse(fs.readFileSync('contractAddrs-test.json'))
+const deployments = JSON.parse(fs.readFileSync('deployments-test.json'))
 const BN = web3.utils.BN
 
 const Swap = artifacts.require("Swap")
@@ -20,8 +20,8 @@ contract("Swap", accounts => {
         params = await MockParameters.deployed()
         swap = await Swap.deployed()
         weth = await MockWETH.deployed()
-        eusd = await Token.at(contractAddrs.fixedLeg)
-        leth = await Token.at(contractAddrs.floatLeg)
+        eusd = await Token.at(deployments.fixedLeg)
+        leth = await Token.at(deployments.floatLeg)
         feed = await MockPrice.deployed()
     })
 
@@ -103,7 +103,7 @@ contract("Swap", accounts => {
 
         await weth.approve(swap.address, toWei( 2.077), { from: accounts[0] })
         await weth.approve(swap.address, toWei(10.101), { from: accounts[1] })
-        await weth.approve(swap.address, toWei(  .304), { from: accounts[2] })
+        await weth.approve(swap.address, toWei(  1.304), { from: accounts[2] })
         await weth.approve(swap.address, toWei(    11), { from: accounts[3] })
         await swap.buyFloat(toWei(   11), accounts[3], { from: accounts[3] })
         await swap.buyFixed(toWei( 2077), accounts[0], { from: accounts[0] })
@@ -714,5 +714,14 @@ contract("Swap", accounts => {
         const expectedValue = (toWei(2077).mul(toWei(1)).div(/*toWei(1.01*1000)*/ new BN('1010101010101010101010')))
 
         assert.equal(wethBalAfter.sub(wethBalBefore).toString(), expectedValue.toString());
+    })
+
+    it("should restrict acccess to setParameters()", async () => {
+        try {
+            await rates.setParameters(toWei(2), { from: accounts[1] });
+        } catch(e) {
+            return;
+        }
+        assert.fail();
     })
 })

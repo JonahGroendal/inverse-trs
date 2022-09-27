@@ -14,6 +14,10 @@ const MockWETH = artifacts.require("MockWETH")
 const MockMath = artifacts.require("MockMath")
 
 const addrs = {
+  arbitrum: {
+    chainlinkFeed: "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
+    weth: "", // TODO
+  },
   goerli: {
     chainlinkFeed: "0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e",
     weth: "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
@@ -26,10 +30,11 @@ const addrs = {
 
 module.exports = async function (deployer, network, accounts) {
   const isNetwork = networks => (networks.includes(network))
-  const isTest = isNetwork(['test', 'development'])
+  const isLocal   = isNetwork(['test',   'development'])
+  const isTestnet = isNetwork(['goerli', 'goerli-fork'])
 
-  if (isNetwork(['test', 'development', 'goerli', 'goerli-fork'])) {
-    if (isTest) {
+  if (isLocal || isTestnet) {
+    if (isLocal) {
       await deployer.deploy(MockMath)
       await deployer.deploy(MockPrice)
       await deployer.deploy(MockModel)
@@ -39,18 +44,19 @@ module.exports = async function (deployer, network, accounts) {
     }
     await deployer.deploy(LinearModel)
 
-    await deployer.deploy(Timelock, 0, [accounts[0]], ['0x0000000000000000000000000000000000000000'])
+    const minDelay = (isLocal || isTestnet) ? 0 : (7 * 24 * 60 * 60)
+    await deployer.deploy(Timelock, minDelay, [accounts[0]], ['0x0000000000000000000000000000000000000000'])
 
     //const fixedLeg = await deployer.deploy(Token, "Hedged WETH", "EUSD", accounts[0])
     //const floatLeg = await deployer.deploy(Token, "Leveraged WETH", "LETH", accounts[0])
     //await deployer.deploy(Swap, MockPrice.address, MockModel.address, fixedLeg.address, floatLeg.address, MockWETH.address)
-    const fixedLeg = await deployProxy(Token, ["Hedged WETH", "EUSD",    accounts[0]], { deployer, kind: "uups" });
+    const fixedLeg = await deployProxy(Token, ["Hedged WETH",    "EUSD", accounts[0]], { deployer, kind: "uups" });
     const floatLeg = await deployProxy(Token, ["Leveraged WETH", "LETH", accounts[0]], { deployer, kind: "uups" });
 
     let priceAddr
     let modelAddr
     let wethAddr
-    if (isTest) {
+    if (isLocal) {
       priceAddr = MockPrice.address
       modelAddr = MockModel.address
       wethAddr = MockWETH.address
@@ -59,7 +65,8 @@ module.exports = async function (deployer, network, accounts) {
       modelAddr = LinearModel.address
       wethAddr = addrs[network].weth
     }
-    const params = await deployer.deploy(isTest ? MockParameters : Parameters, '0', modelAddr, priceAddr, fixedLeg.address, floatLeg.address, wethAddr)
+    const fee = isLocal ? '0' : '1000000000000000' // 0.1% to be safe, oracle updates every ~0.49% price change
+    const params = await deployer.deploy(isLocal ? MockParameters : Parameters, fee, modelAddr, priceAddr, fixedLeg.address, floatLeg.address, wethAddr)
     const swap = await deployProxy(Swap, [params.address], { deployer, kind: "uups" })
 
     await fixedLeg.grantRole(await fixedLeg.MINTER_ROLE.call(), swap.address)
@@ -69,11 +76,11 @@ module.exports = async function (deployer, network, accounts) {
     await floatLeg.revokeRole(await floatLeg.DEFAULT_ADMIN_ROLE.call(), accounts[0])
     await fixedLeg.revokeRole(await fixedLeg.DEFAULT_ADMIN_ROLE.call(), accounts[0])
 
-    if (!isTest) {
+    if (!isLocal) {
       await swap.transferOwnership(Timelock.address)
     }
 
-    fs.writeFileSync(`contractAddrs-${network}.json`, JSON.stringify({
+    fs.writeFileSync(`deployments-${network}.json`, JSON.stringify({
       fixedLeg: fixedLeg.address,
       floatLeg: floatLeg.address,
       swap: swap.address,

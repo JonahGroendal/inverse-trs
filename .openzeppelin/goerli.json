@@ -15,6 +15,21 @@
       "address": "0x748b032161b2070C6DFeEe3a05C622ad61A71900",
       "txHash": "0xd23716d690380bf809c32922f31aba9e71fad50d664788abe0a5b756a334cef6",
       "kind": "uups"
+    },
+    {
+      "address": "0x130947FE7a04921faD22D9c3400ecf7e16AEbE98",
+      "txHash": "0x407585ada6fcf2de6ee2cc1ea59d61b4fa2606226524c45805581ca215a337de",
+      "kind": "uups"
+    },
+    {
+      "address": "0xEdaE78BbaB80eE01dC4C703e40b795a77e18D7fc",
+      "txHash": "0xd2cfab40a54861b80d310bb1b1a2472b963f146c8e7ee74f7cfc6fb00427ae10",
+      "kind": "uups"
+    },
+    {
+      "address": "0x92785E3144218F1e7b755a2D090B0c2AC1FdD5aD",
+      "txHash": "0xfde1bf383479cb6427ccb315dde9c2fec2439a5d1dd8d59024efc35ca9bc146b",
+      "kind": "uups"
     }
   ],
   "impls": {
@@ -396,6 +411,104 @@
           },
           "t_contract(IModel)9237": {
             "label": "contract IModel"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_uint8": {
+            "label": "uint8"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "d94a563ee2ea501994af8e583b0d6415e05c7bac65b807555e2cda7536f50b22": {
+      "address": "0x621E8B109Ee1FbE8FdBC92Bd54F225d6305B40ed",
+      "txHash": "0xc231d459e6639a0fa940c0ace8e43f179b66406ac38e679480acccee0be4c082",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_uint8",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "contract": "ERC1967UpgradeUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
+          },
+          {
+            "contract": "UUPSUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
+          },
+          {
+            "contract": "Rates",
+            "label": "interest",
+            "type": "t_uint256",
+            "src": "../project:/contracts/Rates.sol:25"
+          },
+          {
+            "contract": "Rates",
+            "label": "startTime",
+            "type": "t_uint256",
+            "src": "../project:/contracts/Rates.sol:29"
+          },
+          {
+            "contract": "Rates",
+            "label": "startValue",
+            "type": "t_uint256",
+            "src": "../project:/contracts/Rates.sol:32"
+          },
+          {
+            "contract": "Swap",
+            "label": "params",
+            "type": "t_contract(IParameters)9264",
+            "src": "../project:/contracts/Swap.sol:13"
+          }
+        ],
+        "types": {
+          "t_contract(IParameters)9264": {
+            "label": "contract IParameters"
+          },
+          "t_uint256": {
+            "label": "uint256"
           },
           "t_array(t_uint256)50_storage": {
             "label": "uint256[50]"

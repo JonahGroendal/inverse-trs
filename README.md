@@ -4,7 +4,7 @@ VSSS has two product offerings, a stablecoin and an unstable (i.e. leveraged) co
   
 Both tokens are collateralized with the same underlying asset. The stablecoin maintains a peg to a target asset, for example USD, via a price feed. Conversely, the unstablecoin offeres leveraged exposure to the underlying asset.
 
-Essentially, it's an equity swap contract with tokenized fixed and floating legs, with payments and collateral in the reference asset.
+Essentially, it's an equity swap contract with tokenized floating and equity legs, with payments and collateral in the reference equity.
 
 # How It Works
 Each Swap contract creates two synthetic assets whose values are determined by a price feed and backed by an underlying asset. Either synthetic asset can be minted or burned on-demand by depositing/withdrawing some of the underlying asset into/out of the Swap contract. For example, in an ETH/USD contract, you can deposit ETH to mint either synthetic USD or leveraged ETH, or you can withdraw ETH by burning synthetic USD or leveraged ETH.
@@ -37,7 +37,9 @@ L varies with R such that the following is always true:
 
 
 # Fees
-All fees are used to serve cryptoeconomic goals such as maintaining a target collateralization ratio. They are taken from some participants and given to others. They don't go to a DAO. 
+There's a 0.1% fee on trades, given to equity and floating leg holders. The fee is put into the equity leg pool and, in turn, factored into the interest rate via market forces.
+
+Value is conserved within each swap contract. No disbursements of any kind are transferred out of the system.
 
 ## One-time Fees
 Every buy (mint) or sell (burn) has an associated fee that's proportional to the value of the trade. All proceeds from fees are put into the floating-leg pool, meaning they're given to floating-leg token holders.   
@@ -181,7 +183,11 @@ cons:
 
 
 # TODO
-- subtract the cost of gas from the premium so small transactions aren't disencentivized
+- update solidity version
+- change naming
+  - fixedLeg -> floatingLeg
+  - floatLeg -> equityLeg
+  - Volatility Swap -> Equity Swap
 - look into using super cheap exp() function
 - consolidate premium rates functions
 - make sure not vulnerable to erc 777 reentry
