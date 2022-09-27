@@ -47,11 +47,11 @@ module.exports = async function (deployer, network, accounts) {
     const minDelay = (isLocal || isTestnet) ? 0 : (7 * 24 * 60 * 60)
     await deployer.deploy(Timelock, minDelay, [accounts[0]], ['0x0000000000000000000000000000000000000000'])
 
-    //const fixedLeg = await deployer.deploy(Token, "Hedged WETH", "EUSD", accounts[0])
-    //const floatLeg = await deployer.deploy(Token, "Leveraged WETH", "LETH", accounts[0])
-    //await deployer.deploy(Swap, MockPrice.address, MockModel.address, fixedLeg.address, floatLeg.address, MockWETH.address)
-    const fixedLeg = await deployProxy(Token, ["Hedged WETH",    "EUSD", accounts[0]], { deployer, kind: "uups" });
-    const floatLeg = await deployProxy(Token, ["Leveraged WETH", "LETH", accounts[0]], { deployer, kind: "uups" });
+    //const floatLeg = await deployer.deploy(Token, "Hedged WETH", "EUSD", accounts[0])
+    //const equityLeg = await deployer.deploy(Token, "Leveraged WETH", "LETH", accounts[0])
+    //await deployer.deploy(Swap, MockPrice.address, MockModel.address, floatLeg.address, equityLeg.address, MockWETH.address)
+    const floatLeg  = await deployProxy(Token, ["Hedged WETH",    "EUSD", accounts[0]], { deployer, kind: "uups" });
+    const equityLeg = await deployProxy(Token, ["Leveraged WETH", "LETH", accounts[0]], { deployer, kind: "uups" });
 
     let priceAddr
     let modelAddr
@@ -66,23 +66,23 @@ module.exports = async function (deployer, network, accounts) {
       wethAddr = addrs[network].weth
     }
     const fee = isLocal ? '0' : '1000000000000000' // 0.1% to be safe, oracle updates every ~0.49% price change
-    const params = await deployer.deploy(isLocal ? MockParameters : Parameters, fee, modelAddr, priceAddr, fixedLeg.address, floatLeg.address, wethAddr)
+    const params = await deployer.deploy(isLocal ? MockParameters : Parameters, fee, modelAddr, priceAddr, floatLeg.address, equityLeg.address, wethAddr)
     const swap = await deployProxy(Swap, [params.address], { deployer, kind: "uups" })
 
-    await fixedLeg.grantRole(await fixedLeg.MINTER_ROLE.call(), swap.address)
     await floatLeg.grantRole(await floatLeg.MINTER_ROLE.call(), swap.address)
-    await fixedLeg.grantRole(await fixedLeg.DEFAULT_ADMIN_ROLE.call(), Timelock.address)
+    await equityLeg.grantRole(await equityLeg.MINTER_ROLE.call(), swap.address)
     await floatLeg.grantRole(await floatLeg.DEFAULT_ADMIN_ROLE.call(), Timelock.address)
+    await equityLeg.grantRole(await equityLeg.DEFAULT_ADMIN_ROLE.call(), Timelock.address)
+    await equityLeg.revokeRole(await equityLeg.DEFAULT_ADMIN_ROLE.call(), accounts[0])
     await floatLeg.revokeRole(await floatLeg.DEFAULT_ADMIN_ROLE.call(), accounts[0])
-    await fixedLeg.revokeRole(await fixedLeg.DEFAULT_ADMIN_ROLE.call(), accounts[0])
 
     if (!isLocal) {
       await swap.transferOwnership(Timelock.address)
     }
 
     fs.writeFileSync(`deployments-${network}.json`, JSON.stringify({
-      fixedLeg: fixedLeg.address,
-      floatLeg: floatLeg.address,
+      floatLeg:  floatLeg.address,
+      equityLeg: equityLeg.address,
       swap: swap.address,
       timelock: Timelock.address,
     }, undefined, 2))

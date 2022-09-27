@@ -185,8 +185,6 @@ cons:
 # TODO
 - update solidity version
 - change naming
-  - fixedLeg -> floatingLeg
-  - floatLeg -> equityLeg
   - Volatility Swap -> Equity Swap
 - look into using super cheap exp() function
 - consolidate premium rates functions

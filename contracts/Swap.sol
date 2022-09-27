@@ -8,16 +8,16 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 contract Swap is ISwap, Interest, OwnableUpgradeable, UUPSUpgradeable {
-    // /// @notice Minimum allowed value of floatLeg in underlying
-    // /// @dev prevents floatLeg `totalSupply` from growing too quickly and overflowing
-    // uint constant MIN_FLOAT_TV = 10**13;
+    // /// @notice Minimum allowed value of equityLeg in underlying
+    // /// @dev prevents equityLeg `totalSupply` from growing too quickly and overflowing
+    // uint constant MIN_EQUITY_TV = 10**13;
 
     IParameters public params;
 
-    event BuyFixed (address indexed buyer,  uint amount, uint value);
-    event SellFixed(address indexed seller, uint amount, uint value);
-    event BuyFloat (address indexed buyer,  uint amount, uint value);
-    event SellFloat(address indexed seller, uint amount, uint value);
+    event BuyFloat  (address indexed buyer,  uint amount, uint value);
+    event SellFloat (address indexed seller, uint amount, uint value);
+    event BuyEquity (address indexed buyer,  uint amount, uint value);
+    event SellEquity(address indexed seller, uint amount, uint value);
     event ParametersChanged(address params);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -32,102 +32,102 @@ contract Swap is ISwap, Interest, OwnableUpgradeable, UUPSUpgradeable {
         setParameters(_params);
     }
 
-    /// @notice Buy into fixed leg, minting `amount` tokens
-    function buyFixed(uint amount, address to) external {
-        (uint fee, IModel model, IPrice price, IToken fixedLeg, , IToken underlying) = params.get();
+    /// @notice Buy into floating leg, minting `amount` tokens
+    function buyFloat(uint amount, address to) external {
+        (uint fee, IModel model, IPrice price, IToken floatLeg, , IToken underlying) = params.get();
         uint potValue = underlying.balanceOf(address(this));
         uint _accrewedMul = accrewedMul();
-        (uint value, uint tv) = _fixedValue(
-            amount, price.get(), fixedLeg.totalSupply(), potValue, _accrewedMul
+        (uint value, uint tv) = _floatValue(
+            amount, price.get(), floatLeg.totalSupply(), potValue, _accrewedMul
         );
         require(value > 0, "Zero value trade");
         value += value * fee / ONE;
         underlying.transferFrom(msg.sender, address(this), value);
-        fixedLeg.mint(to, amount);
-        _updateRate(model, potValue + value, tv, _accrewedMul);
-        emit BuyFixed(to, amount, value);
-    }
-
-    /// @notice Sell out of fixed leg, burning `amount` tokens
-    function sellFixed(uint amount, address to) external {
-        (uint fee, IModel model, IPrice price, IToken fixedLeg, , IToken underlying) = params.get();
-        uint potValue = underlying.balanceOf(address(this));
-        uint _accrewedMul = accrewedMul();
-        (uint value, uint tv) = _fixedValue(
-            amount, price.get(), fixedLeg.totalSupply(), potValue, _accrewedMul
-        );
-        require(value > 0, "Zero value trade");
-        value -= value * fee / ONE;
-        underlying.transfer(to, value);
-        fixedLeg.burnFrom(msg.sender, amount);
-        _updateRate(model, potValue - value, tv, _accrewedMul);
-        emit SellFixed(to, amount, value);
-    }
-
-    /// @notice Buy into floating leg, minting `amount` tokens
-    function buyFloat(uint amount, address to) external {
-        (uint fee, IModel model, IPrice price, IToken fixedLeg, IToken floatLeg, IToken underlying) = params.get();
-        uint potValue = underlying.balanceOf(address(this));
-        uint _accrewedMul = accrewedMul();
-        uint fixedTV = _fixedTV(potValue, fixedLeg.totalSupply(), price.get(), _accrewedMul);
-        uint floatTV = potValue - fixedTV;
-        uint value = _floatValue(amount, floatLeg.totalSupply(), floatTV);
-        require(value > 0, "Zero value trade");
-        if (floatTV > 0) {
-            value += (value * fee / ONE) * fixedTV / floatTV;
-        }
-        underlying.transferFrom(msg.sender, address(this), value);
         floatLeg.mint(to, amount);
-        _updateRate(model, potValue + value, fixedTV, _accrewedMul);
+        _updateRate(model, potValue + value, tv, _accrewedMul);
         emit BuyFloat(to, amount, value);
     }
 
     /// @notice Sell out of floating leg, burning `amount` tokens
     function sellFloat(uint amount, address to) external {
-        (uint fee, IModel model, IPrice price, IToken fixedLeg, IToken floatLeg, IToken underlying) = params.get();
+        (uint fee, IModel model, IPrice price, IToken floatLeg, , IToken underlying) = params.get();
         uint potValue = underlying.balanceOf(address(this));
         uint _accrewedMul = accrewedMul();
-        uint fixedTV = _fixedTV(potValue, fixedLeg.totalSupply(), price.get(), _accrewedMul);
-        uint floatTV = potValue - fixedTV;
-        uint value = _floatValue(amount, floatLeg.totalSupply(), floatTV);
+        (uint value, uint tv) = _floatValue(
+            amount, price.get(), floatLeg.totalSupply(), potValue, _accrewedMul
+        );
         require(value > 0, "Zero value trade");
-        if (floatTV > 0) {
-            value -= (value * fee / ONE) * fixedTV / floatTV;
-        }
+        value -= value * fee / ONE;
         underlying.transfer(to, value);
         floatLeg.burnFrom(msg.sender, amount);
-        _updateRate(model, potValue - value, fixedTV, _accrewedMul);
+        _updateRate(model, potValue - value, tv, _accrewedMul);
         emit SellFloat(to, amount, value);
     }
 
-    /// @notice Value in underlying of `amount` fixedLeg tokens
-    function fixedValue(uint amount) external view returns (uint, uint) {
-        (, , IPrice price, IToken fixedLeg, , IToken underlying) = params.get();
+    /// @notice Buy into equity leg, minting `amount` tokens
+    function buyEquity(uint amount, address to) external {
+        (uint fee, IModel model, IPrice price, IToken floatLeg, IToken equityLeg, IToken underlying) = params.get();
+        uint potValue = underlying.balanceOf(address(this));
         uint _accrewedMul = accrewedMul();
-        return _fixedValue(amount, price.get(), fixedLeg.totalSupply(), underlying.balanceOf(address(this)), _accrewedMul);
+        uint floatTV = _floatTV(potValue, floatLeg.totalSupply(), price.get(), _accrewedMul);
+        uint equityTV = potValue - floatTV;
+        uint value = _equityValue(amount, equityLeg.totalSupply(), equityTV);
+        require(value > 0, "Zero value trade");
+        if (equityTV > 0) {
+            value += (value * fee / ONE) * floatTV / equityTV;
+        }
+        underlying.transferFrom(msg.sender, address(this), value);
+        equityLeg.mint(to, amount);
+        _updateRate(model, potValue + value, floatTV, _accrewedMul);
+        emit BuyEquity(to, amount, value);
+    }
+
+    /// @notice Sell out of equity leg, burning `amount` tokens
+    function sellEquity(uint amount, address to) external {
+        (uint fee, IModel model, IPrice price, IToken floatLeg, IToken equityLeg, IToken underlying) = params.get();
+        uint potValue = underlying.balanceOf(address(this));
+        uint _accrewedMul = accrewedMul();
+        uint floatTV = _floatTV(potValue, floatLeg.totalSupply(), price.get(), _accrewedMul);
+        uint equityTV = potValue - floatTV;
+        uint value = _equityValue(amount, equityLeg.totalSupply(), equityTV);
+        require(value > 0, "Zero value trade");
+        if (equityTV > 0) {
+            value -= (value * fee / ONE) * floatTV / equityTV;
+        }
+        underlying.transfer(to, value);
+        equityLeg.burnFrom(msg.sender, amount);
+        _updateRate(model, potValue - value, floatTV, _accrewedMul);
+        emit SellEquity(to, amount, value);
     }
 
     /// @notice Value in underlying of `amount` floatLeg tokens
-    function floatValue(uint amount) external view returns (uint) {
-        (, , IPrice price, IToken fixedLeg, IToken floatLeg, IToken underlying) = params.get();
-        uint potValue = underlying.balanceOf(address(this));
+    function floatValue(uint amount) external view returns (uint, uint) {
+        (, , IPrice price, IToken floatLeg, , IToken underlying) = params.get();
         uint _accrewedMul = accrewedMul();
-        return _floatValue(amount, floatLeg.totalSupply(), potValue - _fixedTV(potValue, fixedLeg.totalSupply(), price.get(), _accrewedMul));
+        return _floatValue(amount, price.get(), floatLeg.totalSupply(), underlying.balanceOf(address(this)), _accrewedMul);
     }
 
-    /// @notice Nominal value of 1 fixedLeg token in underlying
+    /// @notice Value in underlying of `amount` equityLeg tokens
+    function equityValue(uint amount) external view returns (uint) {
+        (, , IPrice price, IToken floatLeg, IToken equityLeg, IToken underlying) = params.get();
+        uint potValue = underlying.balanceOf(address(this));
+        uint _accrewedMul = accrewedMul();
+        return _equityValue(amount, equityLeg.totalSupply(), potValue - _floatTV(potValue, floatLeg.totalSupply(), price.get(), _accrewedMul));
+    }
+
+    /// @notice Nominal value of 1 floatLeg token in underlying
     /// @dev underlying exchange rate + accrewed interest
-    function fixedValueNominal(uint amount) external view returns (uint) {
+    function floatValueNominal(uint amount) external view returns (uint) {
         (, , IPrice price, , , ) = params.get();
-        return _fixedValueNominal(amount, accrewedMul(), price.get());
+        return _floatValueNominal(amount, accrewedMul(), price.get());
     }
 
     /// @dev Would behoove some stakeholders to call this after a price change
     function updateInterestRate() external {
-        (, IModel model, IPrice price, IToken fixedLeg, , IToken underlying) = params.get();
+        (, IModel model, IPrice price, IToken floatLeg, , IToken underlying) = params.get();
         uint potValue = underlying.balanceOf(address(this));
         uint _accrewedMul = accrewedMul();
-        _updateRate(model, potValue, _fixedTV(potValue, fixedLeg.totalSupply(), price.get(), _accrewedMul), _accrewedMul);
+        _updateRate(model, potValue, _floatTV(potValue, floatLeg.totalSupply(), price.get(), _accrewedMul), _accrewedMul);
     }
 
     function setParameters(address _params) public onlyOwner {
@@ -135,29 +135,29 @@ contract Swap is ISwap, Interest, OwnableUpgradeable, UUPSUpgradeable {
         emit ParametersChanged(_params);
     }
 
-    function _floatValue(uint amount, uint supply, uint totalValue) internal pure returns (uint) {
+    function _equityValue(uint amount, uint supply, uint totalValue) internal pure returns (uint) {
         if (supply == 0) {
             return amount;
         }
         return amount*totalValue/supply;
     }
 
-    function _fixedValue(uint amount, uint price, uint supply, uint potValue, uint _accrewedMul) internal pure returns (uint, uint) {
-        uint nomValue = _fixedValueNominal(amount, _accrewedMul, price);
-        uint nomTV    = _fixedValueNominal(supply, _accrewedMul, price);
+    function _floatValue(uint amount, uint price, uint supply, uint potValue, uint _accrewedMul) internal pure returns (uint, uint) {
+        uint nomValue = _floatValueNominal(amount, _accrewedMul, price);
+        uint nomTV    = _floatValueNominal(supply, _accrewedMul, price);
         if (potValue < nomTV)
             return (amount*potValue/supply, potValue);
         return (nomValue, nomTV);
     }
 
-    function _fixedTV(uint potValue, uint supply, uint price, uint _accrewedMul) internal pure returns (uint) {
-        uint nomValue = _fixedValueNominal(supply, _accrewedMul, price);
+    function _floatTV(uint potValue, uint supply, uint price, uint _accrewedMul) internal pure returns (uint) {
+        uint nomValue = _floatValueNominal(supply, _accrewedMul, price);
         if (potValue < nomValue)
             return potValue;
         return nomValue;
     }
 
-    function _fixedValueNominal(uint amount, uint _accrewedMul, uint price) internal pure returns (uint) {
+    function _floatValueNominal(uint amount, uint _accrewedMul, uint price) internal pure returns (uint) {
         return amount * (_accrewedMul / ONE_8) / price;
     }
 

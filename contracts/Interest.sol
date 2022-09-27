@@ -32,8 +32,8 @@ contract Interest is IInterest, Initializable {
         startValue = ONE_26;
     }
 
-    /// @notice Accrewed interest multiplier. Nominal value of 1 fixedLeg token in denominating currency
-    /// @return Target currency-fixed exchange rate, expressed as denominating currency per fixed. 26-decimal fixed-point 
+    /// @notice Accrewed interest multiplier. Nominal value of 1 floatLeg token in denominating currency
+    /// @return Target currency-float exchange rate, expressed as denominating currency per float. 26-decimal fixed-point 
     function accrewedMul() public view returns (uint) {
         unchecked {
             return startValue * (rate*ONE_8).pow((block.timestamp - startTime) / COMPOUNDING_PERIOD) / ONE_26;
@@ -41,8 +41,8 @@ contract Interest is IInterest, Initializable {
     }
 
     /// @notice Update interest rate according to model
-    function _updateRate(IModel model, uint potValue, uint fixedTV, uint _accrewedMul) internal {
-        uint _rate = uint(int(ONE) + model.getInterestRate(potValue, fixedTV));
+    function _updateRate(IModel model, uint potValue, uint floatTV, uint _accrewedMul) internal {
+        uint _rate = uint(int(ONE) + model.getInterestRate(potValue, floatTV));
         if (_rate != rate) {
             _setRate(_rate, _accrewedMul);
         }
