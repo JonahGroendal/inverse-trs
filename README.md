@@ -16,7 +16,7 @@ This system is not audited. The swap contract is quite small and I did my best t
 
 #### Administered
 The Swap and Token contracts are administed and upgradeable by me, but they're behind a one-week timelock.
-This enforces that I must announce any parameter changes or upgrades a week in advance, giving traders time to exit the system.
+This enforces that I must schedule any parameter changes or upgrades a week in advance, giving participants time to exit the system.
 
 ## Nomenclature
 ### Swap Contracts
