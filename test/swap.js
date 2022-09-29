@@ -20,8 +20,8 @@ contract("Swap", accounts => {
         params = await MockParameters.deployed()
         swap = await Swap.deployed()
         weth = await MockWETH.deployed()
-        eusd = await Token.at(deployments.floatLeg)
-        leth = await Token.at(deployments.equityLeg)
+        eusd = await Token.at(deployments.hedge)
+        leth = await Token.at(deployments.leverage)
         feed = await MockPrice.deployed()
     })
 
@@ -32,7 +32,7 @@ contract("Swap", accounts => {
         const lethBalBefore = await leth.balanceOf.call(accounts[0])
 
         await weth.approve(swap.address, toWei(10))
-        await swap.buyFloat(toWei(10000), accounts[0])
+        await swap.buyHedge(toWei(10000), accounts[0])
 
         const wethBalAfter = await weth.balanceOf.call(accounts[0])
         const eusdBalAfter = await eusd.balanceOf.call(accounts[0])
@@ -50,7 +50,7 @@ contract("Swap", accounts => {
         const lethBalBefore = await leth.balanceOf.call(accounts[0])
 
         await eusd.approve(swap.address, toWei(10000))
-        await swap.sellFloat(toWei(10000), accounts[0])
+        await swap.sellHedge(toWei(10000), accounts[0])
 
         const wethBalAfter = await weth.balanceOf.call(accounts[0])
         const eusdBalAfter = await eusd.balanceOf.call(accounts[0])
@@ -68,7 +68,7 @@ contract("Swap", accounts => {
         const lethBalBefore = await leth.balanceOf.call(accounts[0])
 
         await weth.approve(swap.address, toWei(10))
-        await swap.buyEquity(toWei(10), accounts[0])
+        await swap.buyLeverage(toWei(10), accounts[0])
 
         const wethBalAfter = await weth.balanceOf.call(accounts[0])
         const eusdBalAfter = await eusd.balanceOf.call(accounts[0])
@@ -86,7 +86,7 @@ contract("Swap", accounts => {
         const lethBalBefore = await leth.balanceOf.call(accounts[0])
 
         await leth.approve(swap.address, toWei(10))
-        await swap.sellEquity(toWei(10), accounts[0])
+        await swap.sellLeverage(toWei(10), accounts[0])
 
         const wethBalAfter = await weth.balanceOf.call(accounts[0])
         const eusdBalAfter = await eusd.balanceOf.call(accounts[0])
@@ -105,10 +105,10 @@ contract("Swap", accounts => {
         await weth.approve(swap.address, toWei(10.101), { from: accounts[1] })
         await weth.approve(swap.address, toWei(  1.304), { from: accounts[2] })
         await weth.approve(swap.address, toWei(    11), { from: accounts[3] })
-        await swap.buyEquity(toWei(   11), accounts[3], { from: accounts[3] })
-        await swap.buyFloat (toWei( 2077), accounts[0], { from: accounts[0] })
-        await swap.buyFloat (toWei(10101), accounts[1], { from: accounts[1] })
-        await swap.buyFloat (toWei(  304), accounts[2], { from: accounts[2] })
+        await swap.buyLeverage(toWei(   11), accounts[3], { from: accounts[3] })
+        await swap.buyHedge (toWei( 2077), accounts[0], { from: accounts[0] })
+        await swap.buyHedge (toWei(10101), accounts[1], { from: accounts[1] })
+        await swap.buyHedge (toWei(  304), accounts[2], { from: accounts[2] })
 
         const eusdBalsBefore = [
             await eusd.balanceOf.call(accounts[0]),
@@ -125,9 +125,9 @@ contract("Swap", accounts => {
         await eusd.approve(swap.address, toWei( 2077), { from: accounts[0] })
         await eusd.approve(swap.address, toWei(10101), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(  304), { from: accounts[2] })
-        await swap.sellFloat(toWei( 2077), accounts[0], { from: accounts[0] })
-        await swap.sellFloat(toWei(10101), accounts[1], { from: accounts[1] })
-        await swap.sellFloat(toWei(  304), accounts[2], { from: accounts[2] })
+        await swap.sellHedge(toWei( 2077), accounts[0], { from: accounts[0] })
+        await swap.sellHedge(toWei(10101), accounts[1], { from: accounts[1] })
+        await swap.sellHedge(toWei(  304), accounts[2], { from: accounts[2] })
 
         const eusdBalsAfter = [
             await eusd.balanceOf.call(accounts[0]),
@@ -158,7 +158,7 @@ contract("Swap", accounts => {
         // reset contract state before next test
         await weth.transfer(swap.address, toWei(1), { from: accounts[3] }) // get contract out of stuck state due to overflow protection
         await leth.approve(swap.address, toWei(11), { from: accounts[3] })
-        await swap.sellEquity(toWei(11), accounts[3], { from: accounts[3] })          // reset balances to 0
+        await swap.sellLeverage(toWei(11), accounts[3], { from: accounts[3] })          // reset balances to 0
         await feed.setPrice(toWei(1000))
     })
 
@@ -168,10 +168,10 @@ contract("Swap", accounts => {
         await weth.approve(swap.address, toWei(10.101), { from: accounts[1] })
         await weth.approve(swap.address, toWei(  .304), { from: accounts[2] })
         await weth.approve(swap.address, toWei(    11), { from: accounts[3] })
-        await swap.buyEquity(toWei(   11), accounts[3], { from: accounts[3] });
-        await swap.buyFloat (toWei( 2077), accounts[0], { from: accounts[0] });
-        await swap.buyFloat (toWei(10101), accounts[1], { from: accounts[1] });
-        await swap.buyFloat (toWei(  304), accounts[2], { from: accounts[2] });
+        await swap.buyLeverage(toWei(   11), accounts[3], { from: accounts[3] });
+        await swap.buyHedge (toWei( 2077), accounts[0], { from: accounts[0] });
+        await swap.buyHedge (toWei(10101), accounts[1], { from: accounts[1] });
+        await swap.buyHedge (toWei(  304), accounts[2], { from: accounts[2] });
 
         const eusdBalsBefore = [
             await eusd.balanceOf.call(accounts[0]),
@@ -189,10 +189,10 @@ contract("Swap", accounts => {
         await eusd.approve(swap.address, toWei(10101), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(  304), { from: accounts[2] })
         await leth.approve(swap.address, toWei(   11), { from: accounts[3] })
-        await swap.sellFloat (toWei( 2077), accounts[0], { from: accounts[0] });
-        await swap.sellFloat (toWei(10101), accounts[1], { from: accounts[1] });
-        await swap.sellFloat (toWei(  304), accounts[2], { from: accounts[2] });
-        await swap.sellEquity(toWei(   11), accounts[3], { from: accounts[3] });
+        await swap.sellHedge (toWei( 2077), accounts[0], { from: accounts[0] });
+        await swap.sellHedge (toWei(10101), accounts[1], { from: accounts[1] });
+        await swap.sellHedge (toWei(  304), accounts[2], { from: accounts[2] });
+        await swap.sellLeverage(toWei(   11), accounts[3], { from: accounts[3] });
 
         const eusdBalsAfter = [
             await eusd.balanceOf.call(accounts[0]),
@@ -224,10 +224,10 @@ contract("Swap", accounts => {
         await weth.approve(swap.address, toWei(10.101), { from: accounts[1] })
         await weth.approve(swap.address, toWei(  .304), { from: accounts[2] })
         await weth.approve(swap.address, toWei(    11), { from: accounts[3] })
-        await swap.buyEquity(toWei(   11), accounts[3], { from: accounts[3] });
-        await swap.buyFloat (toWei( 2077), accounts[0], { from: accounts[0] });
-        await swap.buyFloat (toWei(10101), accounts[1], { from: accounts[1] });
-        await swap.buyFloat (toWei(  304), accounts[2], { from: accounts[2] });
+        await swap.buyLeverage(toWei(   11), accounts[3], { from: accounts[3] });
+        await swap.buyHedge (toWei( 2077), accounts[0], { from: accounts[0] });
+        await swap.buyHedge (toWei(10101), accounts[1], { from: accounts[1] });
+        await swap.buyHedge (toWei(  304), accounts[2], { from: accounts[2] });
 
         const eusdBalsBefore = [
             await eusd.balanceOf.call(accounts[0]),
@@ -245,10 +245,10 @@ contract("Swap", accounts => {
         await eusd.approve(swap.address, toWei(10101), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(  304), { from: accounts[2] })
         await leth.approve(swap.address, toWei(   11), { from: accounts[3] })
-        await swap.sellFloat (toWei( 2077), accounts[0], { from: accounts[0] });
-        await swap.sellFloat (toWei(10101), accounts[1], { from: accounts[1] });
-        await swap.sellFloat (toWei(  304), accounts[2], { from: accounts[2] });
-        await swap.sellEquity(toWei(   11), accounts[3], { from: accounts[3] });
+        await swap.sellHedge (toWei( 2077), accounts[0], { from: accounts[0] });
+        await swap.sellHedge (toWei(10101), accounts[1], { from: accounts[1] });
+        await swap.sellHedge (toWei(  304), accounts[2], { from: accounts[2] });
+        await swap.sellLeverage(toWei(   11), accounts[3], { from: accounts[3] });
 
         const eusdBalsAfter = [
             await eusd.balanceOf.call(accounts[0]),
@@ -285,10 +285,10 @@ contract("Swap", accounts => {
         await weth.approve(swap.address, toWei(75), { from: accounts[1] })
         await weth.approve(swap.address, toWei(15), { from: accounts[2] })
         await weth.approve(swap.address, toWei(85), { from: accounts[3] })
-        await swap.buyEquity(toWei(   25), accounts[0], { from: accounts[0] });
-        await swap.buyEquity(toWei(   75), accounts[1], { from: accounts[1] });
-        await swap.buyFloat (toWei(15000), accounts[2], { from: accounts[2] });
-        await swap.buyFloat (toWei(85000), accounts[3], { from: accounts[3] });
+        await swap.buyLeverage(toWei(   25), accounts[0], { from: accounts[0] });
+        await swap.buyLeverage(toWei(   75), accounts[1], { from: accounts[1] });
+        await swap.buyHedge (toWei(15000), accounts[2], { from: accounts[2] });
+        await swap.buyHedge (toWei(85000), accounts[3], { from: accounts[3] });
 
         const wethBalsMid = [
             await weth.balanceOf.call(accounts[0]),
@@ -300,10 +300,10 @@ contract("Swap", accounts => {
         await leth.approve(swap.address, toWei(   75), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(15000), { from: accounts[2] })
         await eusd.approve(swap.address, toWei(85000), { from: accounts[3] })
-        await swap.sellEquity(toWei(   25), accounts[0], { from: accounts[0] });
-        await swap.sellEquity(toWei(   75), accounts[1], { from: accounts[1] });
-        await swap.sellFloat (toWei(15000), accounts[2], { from: accounts[2] });
-        await swap.sellFloat (toWei(85000), accounts[3], { from: accounts[3] });
+        await swap.sellLeverage(toWei(   25), accounts[0], { from: accounts[0] });
+        await swap.sellLeverage(toWei(   75), accounts[1], { from: accounts[1] });
+        await swap.sellHedge (toWei(15000), accounts[2], { from: accounts[2] });
+        await swap.sellHedge (toWei(85000), accounts[3], { from: accounts[3] });
 
         const wethBalsAfter = [
             await weth.balanceOf.call(accounts[0]),
@@ -342,10 +342,10 @@ contract("Swap", accounts => {
         await weth.approve(swap.address, toWei(75), { from: accounts[1] })
         await weth.approve(swap.address, toWei(115), { from: accounts[2] })
         await weth.approve(swap.address, toWei(85), { from: accounts[3] })
-        await swap.buyEquity(toWei(    25), accounts[0], { from: accounts[0] });
-        await swap.buyEquity(toWei(    75), accounts[1], { from: accounts[1] });
-        await swap.buyFloat (toWei(115000), accounts[2], { from: accounts[2] });
-        await swap.buyFloat (toWei( 85000), accounts[3], { from: accounts[3] });
+        await swap.buyLeverage(toWei(    25), accounts[0], { from: accounts[0] });
+        await swap.buyLeverage(toWei(    75), accounts[1], { from: accounts[1] });
+        await swap.buyHedge (toWei(115000), accounts[2], { from: accounts[2] });
+        await swap.buyHedge (toWei( 85000), accounts[3], { from: accounts[3] });
 
         const wethBalsMid = [
             await weth.balanceOf.call(accounts[0]),
@@ -357,10 +357,10 @@ contract("Swap", accounts => {
         await leth.approve(swap.address, toWei(    75), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(115000), { from: accounts[2] })
         await eusd.approve(swap.address, toWei( 85000), { from: accounts[3] })
-        await swap.sellEquity(toWei(    25), accounts[0], { from: accounts[0] });
-        await swap.sellEquity(toWei(    75), accounts[1], { from: accounts[1] });
-        await swap.sellFloat (toWei(115000), accounts[2], { from: accounts[2] });
-        await swap.sellFloat (toWei( 85000), accounts[3], { from: accounts[3] });
+        await swap.sellLeverage(toWei(    25), accounts[0], { from: accounts[0] });
+        await swap.sellLeverage(toWei(    75), accounts[1], { from: accounts[1] });
+        await swap.sellHedge (toWei(115000), accounts[2], { from: accounts[2] });
+        await swap.sellHedge (toWei( 85000), accounts[3], { from: accounts[3] });
 
         const wethBalsAfter = [
             await weth.balanceOf.call(accounts[0]),
@@ -397,10 +397,10 @@ contract("Swap", accounts => {
         await weth.approve(swap.address, toWei(75), { from: accounts[1] })
         await weth.approve(swap.address, toWei(15), { from: accounts[2] })
         await weth.approve(swap.address, toWei(85), { from: accounts[3] })
-        await swap.buyEquity(toWei(   25), accounts[0], { from: accounts[0] });
-        await swap.buyEquity(toWei(   75), accounts[1], { from: accounts[1] });
-        await swap.buyFloat (toWei(15000), accounts[2], { from: accounts[2] });
-        await swap.buyFloat (toWei(85000), accounts[3], { from: accounts[3] });
+        await swap.buyLeverage(toWei(   25), accounts[0], { from: accounts[0] });
+        await swap.buyLeverage(toWei(   75), accounts[1], { from: accounts[1] });
+        await swap.buyHedge (toWei(15000), accounts[2], { from: accounts[2] });
+        await swap.buyHedge (toWei(85000), accounts[3], { from: accounts[3] });
 
         const wethBalsMid = [
             await weth.balanceOf.call(accounts[0]),
@@ -412,10 +412,10 @@ contract("Swap", accounts => {
         await leth.approve(swap.address, toWei(   75), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(15000), { from: accounts[2] })
         await eusd.approve(swap.address, toWei(85000), { from: accounts[3] })
-        await swap.sellEquity(toWei(   25), accounts[0], { from: accounts[0] });
-        await swap.sellEquity(toWei(   75), accounts[1], { from: accounts[1] });
-        await swap.sellFloat (toWei(15000), accounts[2], { from: accounts[2] });
-        await swap.sellFloat (toWei(85000), accounts[3], { from: accounts[3] });
+        await swap.sellLeverage(toWei(   25), accounts[0], { from: accounts[0] });
+        await swap.sellLeverage(toWei(   75), accounts[1], { from: accounts[1] });
+        await swap.sellHedge (toWei(15000), accounts[2], { from: accounts[2] });
+        await swap.sellHedge (toWei(85000), accounts[3], { from: accounts[3] });
 
         const wethBalsAfter = [
             await weth.balanceOf.call(accounts[0]),
@@ -454,10 +454,10 @@ contract("Swap", accounts => {
         await weth.approve(swap.address, toWei(75), { from: accounts[1] })
         await weth.approve(swap.address, toWei(115), { from: accounts[2] })
         await weth.approve(swap.address, toWei(85), { from: accounts[3] })
-        await swap.buyEquity(toWei(    25), accounts[0], { from: accounts[0] });
-        await swap.buyEquity(toWei(    75), accounts[1], { from: accounts[1] });
-        await swap.buyFloat (toWei(115000), accounts[2], { from: accounts[2] });
-        await swap.buyFloat (toWei( 85000), accounts[3], { from: accounts[3] });
+        await swap.buyLeverage(toWei(    25), accounts[0], { from: accounts[0] });
+        await swap.buyLeverage(toWei(    75), accounts[1], { from: accounts[1] });
+        await swap.buyHedge (toWei(115000), accounts[2], { from: accounts[2] });
+        await swap.buyHedge (toWei( 85000), accounts[3], { from: accounts[3] });
 
         const wethBalsMid = [
             await weth.balanceOf.call(accounts[0]),
@@ -469,10 +469,10 @@ contract("Swap", accounts => {
         await leth.approve(swap.address, toWei(   75), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(115000), { from: accounts[2] })
         await eusd.approve(swap.address, toWei(85000), { from: accounts[3] })
-        await swap.sellEquity(toWei(    25), accounts[0], { from: accounts[0] });
-        await swap.sellEquity(toWei(    75), accounts[1], { from: accounts[1] });
-        await swap.sellFloat (toWei(115000), accounts[2], { from: accounts[2] });
-        await swap.sellFloat (toWei( 85000), accounts[3], { from: accounts[3] });
+        await swap.sellLeverage(toWei(    25), accounts[0], { from: accounts[0] });
+        await swap.sellLeverage(toWei(    75), accounts[1], { from: accounts[1] });
+        await swap.sellHedge (toWei(115000), accounts[2], { from: accounts[2] });
+        await swap.sellHedge (toWei( 85000), accounts[3], { from: accounts[3] });
 
         const wethBalsAfter = [
             await weth.balanceOf.call(accounts[0]),
@@ -509,10 +509,10 @@ contract("Swap", accounts => {
         await weth.approve(swap.address, toWei(75), { from: accounts[1] })
         await weth.approve(swap.address, toWei(115), { from: accounts[2] })
         await weth.approve(swap.address, toWei(885), { from: accounts[3] })
-        await swap.buyEquity(toWei(    25), accounts[0], { from: accounts[0] });
-        await swap.buyEquity(toWei(    75), accounts[1], { from: accounts[1] });
-        await swap.buyFloat (toWei(115000), accounts[2], { from: accounts[2] });
-        await swap.buyFloat (toWei(885000), accounts[3], { from: accounts[3] });
+        await swap.buyLeverage(toWei(    25), accounts[0], { from: accounts[0] });
+        await swap.buyLeverage(toWei(    75), accounts[1], { from: accounts[1] });
+        await swap.buyHedge (toWei(115000), accounts[2], { from: accounts[2] });
+        await swap.buyHedge (toWei(885000), accounts[3], { from: accounts[3] });
 
         const wethBalsMid = [
             await weth.balanceOf.call(accounts[0]),
@@ -524,10 +524,10 @@ contract("Swap", accounts => {
         await leth.approve(swap.address, toWei(    75), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(115000), { from: accounts[2] })
         await eusd.approve(swap.address, toWei(885000), { from: accounts[3] })
-        await swap.sellEquity(toWei(    25), accounts[0], { from: accounts[0] });
-        await swap.sellEquity(toWei(    75), accounts[1], { from: accounts[1] });
-        await swap.sellFloat (toWei(115000), accounts[2], { from: accounts[2] });
-        await swap.sellFloat (toWei(885000), accounts[3], { from: accounts[3] });
+        await swap.sellLeverage(toWei(    25), accounts[0], { from: accounts[0] });
+        await swap.sellLeverage(toWei(    75), accounts[1], { from: accounts[1] });
+        await swap.sellHedge (toWei(115000), accounts[2], { from: accounts[2] });
+        await swap.sellHedge (toWei(885000), accounts[3], { from: accounts[3] });
 
         const wethBalsAfter = [
             await weth.balanceOf.call(accounts[0]),
@@ -562,20 +562,20 @@ contract("Swap", accounts => {
         await weth.approve(swap.address, toWei(25), { from: accounts[0] })
         await weth.approve(swap.address, toWei(115), { from: accounts[2] })
         await weth.approve(swap.address, toWei(85), { from: accounts[3] })
-        await swap.buyFloat (toWei(115000), accounts[2], { from: accounts[2] });
-        await swap.buyFloat (toWei( 85000), accounts[3], { from: accounts[3] });
-        await swap.buyEquity(toWei(    25), accounts[0], { from: accounts[0] });
+        await swap.buyHedge (toWei(115000), accounts[2], { from: accounts[2] });
+        await swap.buyHedge (toWei( 85000), accounts[3], { from: accounts[3] });
+        await swap.buyLeverage(toWei(    25), accounts[0], { from: accounts[0] });
 
         const wethBalBefore = await weth.balanceOf.call(accounts[1])
 
         await params.setFee(toWei(0.01))
         await weth.approve(swap.address, toWei(150), { from: accounts[1] })
-        await swap.buyEquity(toWei(75), accounts[1], { from: accounts[1] });
+        await swap.buyLeverage(toWei(75), accounts[1], { from: accounts[1] });
         await weth.approve(swap.address, toWei(0), { from: accounts[1] })
         await params.setFee(toWei(0))
         await feed.setPrice(/*toWei(1000*1.01)*/new BN('1010101010101010101010'))
         await leth.approve(swap.address, toWei(   75), { from: accounts[1] })
-        await swap.sellEquity(toWei(75), accounts[1], { from: accounts[1] });
+        await swap.sellLeverage(toWei(75), accounts[1], { from: accounts[1] });
 
         const wethBalAfter = await weth.balanceOf.call(accounts[1])
 
@@ -583,9 +583,9 @@ contract("Swap", accounts => {
         await leth.approve(swap.address, toWei(    25), { from: accounts[0] })
         await eusd.approve(swap.address, toWei(115000), { from: accounts[2] })
         await eusd.approve(swap.address, toWei( 85000), { from: accounts[3] })
-        await swap.sellEquity(toWei(    25), accounts[0], { from: accounts[0] });
-        await swap.sellFloat (toWei(115000), accounts[2], { from: accounts[2] });
-        await swap.sellFloat (toWei( 85000), accounts[3], { from: accounts[3] });
+        await swap.sellLeverage(toWei(    25), accounts[0], { from: accounts[0] });
+        await swap.sellHedge (toWei(115000), accounts[2], { from: accounts[2] });
+        await swap.sellHedge (toWei( 85000), accounts[3], { from: accounts[3] });
 
         assert.equal(wethBalAfter.toString(), wethBalBefore.toString());
     })
@@ -599,16 +599,16 @@ contract("Swap", accounts => {
         await weth.approve(swap.address, toWei(115), { from: accounts[2] })
         await weth.approve(swap.address, toWei(85), { from: accounts[3] })
         await weth.approve(swap.address, toWei(75), { from: accounts[1] })
-        await swap.buyFloat (toWei(115000), accounts[2], { from: accounts[2] });
-        await swap.buyFloat (toWei( 85000), accounts[3], { from: accounts[3] });
-        await swap.buyEquity(toWei(    25), accounts[0], { from: accounts[0] });
-        await swap.buyEquity(toWei(    75), accounts[1], { from: accounts[1] });
+        await swap.buyHedge (toWei(115000), accounts[2], { from: accounts[2] });
+        await swap.buyHedge (toWei( 85000), accounts[3], { from: accounts[3] });
+        await swap.buyLeverage(toWei(    25), accounts[0], { from: accounts[0] });
+        await swap.buyLeverage(toWei(    75), accounts[1], { from: accounts[1] });
 
         const wethBalBefore = await weth.balanceOf.call(accounts[1])
 
         await params.setFee(toWei(0.01))
         await leth.approve(swap.address, toWei(100), { from: accounts[1] })
-        await swap.sellEquity(toWei(75), accounts[1], { from: accounts[1] });
+        await swap.sellLeverage(toWei(75), accounts[1], { from: accounts[1] });
         await leth.approve(swap.address, toWei(0), { from: accounts[1] })
 
         const wethBalAfter1 = await weth.balanceOf.call(accounts[1])
@@ -617,20 +617,20 @@ contract("Swap", accounts => {
         //await feed.setPrice(toWei(1000*0.99))
         await feed.setPrice(new BN('990099009900990099010'))
         await weth.approve(swap.address, toWei(75), { from: accounts[1] });
-        await swap.buyEquity(toWei(75), accounts[1], { from: accounts[1] });
+        await swap.buyLeverage(toWei(75), accounts[1], { from: accounts[1] });
 
         const wethBalAfter2 = await weth.balanceOf.call(accounts[1])
 
         // reset contract state
         await leth.approve(swap.address, toWei(100), { from: accounts[1] })
-        await swap.sellEquity(toWei(75), accounts[1], { from: accounts[1] });
+        await swap.sellLeverage(toWei(75), accounts[1], { from: accounts[1] });
         await leth.approve(swap.address, toWei(0), { from: accounts[1] })
         await leth.approve(swap.address, toWei(    25), { from: accounts[0] })
         await eusd.approve(swap.address, toWei(115000), { from: accounts[2] })
         await eusd.approve(swap.address, toWei( 85000), { from: accounts[3] })
-        await swap.sellEquity(toWei(    25), accounts[0], { from: accounts[0] });
-        await swap.sellFloat (toWei(115000), accounts[2], { from: accounts[2] });
-        await swap.sellFloat (toWei( 85000), accounts[3], { from: accounts[3] });
+        await swap.sellLeverage(toWei(    25), accounts[0], { from: accounts[0] });
+        await swap.sellHedge (toWei(115000), accounts[2], { from: accounts[2] });
+        await swap.sellHedge (toWei( 85000), accounts[3], { from: accounts[3] });
 
         // const usdValBefore = 75*1000
         // const usdValAfterIfNoLev = 75 * 990.099009900990099
@@ -651,21 +651,21 @@ contract("Swap", accounts => {
         await weth.approve(swap.address, toWei(10.101), { from: accounts[1] })
         await weth.approve(swap.address, toWei(  .304), { from: accounts[2] })
         await weth.approve(swap.address, toWei(    11), { from: accounts[3] })
-        await swap.buyEquity(toWei(   11), accounts[3], { from: accounts[3] });
-        await swap.buyFloat (toWei(10101), accounts[1], { from: accounts[1] });
-        await swap.buyFloat (toWei(  304), accounts[2], { from: accounts[2] });
+        await swap.buyLeverage(toWei(   11), accounts[3], { from: accounts[3] });
+        await swap.buyHedge (toWei(10101), accounts[1], { from: accounts[1] });
+        await swap.buyHedge (toWei(  304), accounts[2], { from: accounts[2] });
 
         const wethBalBefore = await weth.balanceOf.call(accounts[0])
         
         await params.setFee(toWei(0.01))
         await weth.approve(swap.address, toWei(3), { from: accounts[0] })
-        await swap.buyFloat (toWei( 2077), accounts[0], { from: accounts[0] });
+        await swap.buyHedge (toWei( 2077), accounts[0], { from: accounts[0] });
         await weth.approve(swap.address, toWei(0), { from: accounts[0] })
         //await feed.setPrice(toWei(1000*0.99))
         await feed.setPrice(new BN('990099009900990099010'))
         await params.setFee(toWei(0))
         await eusd.approve(swap.address, toWei( 2077), { from: accounts[0] })
-        await swap.sellFloat (toWei( 2077), accounts[0], { from: accounts[0] });
+        await swap.sellHedge (toWei( 2077), accounts[0], { from: accounts[0] });
 
         const wethBalAfter = await weth.balanceOf.call(accounts[0])
 
@@ -673,9 +673,9 @@ contract("Swap", accounts => {
         await eusd.approve(swap.address, toWei(10101), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(  304), { from: accounts[2] })
         await leth.approve(swap.address, toWei(   11), { from: accounts[3] })
-        await swap.sellFloat (toWei(10101), accounts[1], { from: accounts[1] });
-        await swap.sellFloat (toWei(  304), accounts[2], { from: accounts[2] });
-        await swap.sellEquity(toWei(   11), accounts[3], { from: accounts[3] });
+        await swap.sellHedge (toWei(10101), accounts[1], { from: accounts[1] });
+        await swap.sellHedge (toWei(  304), accounts[2], { from: accounts[2] });
+        await swap.sellLeverage(toWei(   11), accounts[3], { from: accounts[3] });
 
         assert.equal(wethBalAfter.toString(), wethBalBefore.sub(new BN(1)).toString());
     })
@@ -688,18 +688,18 @@ contract("Swap", accounts => {
         await weth.approve(swap.address, toWei(10.101), { from: accounts[1] })
         await weth.approve(swap.address, toWei(  .304), { from: accounts[2] })
         await weth.approve(swap.address, toWei(    11), { from: accounts[3] })
-        await swap.buyEquity(toWei(   11), accounts[3], { from: accounts[3] });
-        await swap.buyFloat (toWei(10101), accounts[1], { from: accounts[1] });
-        await swap.buyFloat (toWei(  304), accounts[2], { from: accounts[2] });
+        await swap.buyLeverage(toWei(   11), accounts[3], { from: accounts[3] });
+        await swap.buyHedge (toWei(10101), accounts[1], { from: accounts[1] });
+        await swap.buyHedge (toWei(  304), accounts[2], { from: accounts[2] });
     
         await weth.approve(swap.address, toWei(2.077), { from: accounts[0] })
-        await swap.buyFloat (toWei( 2077), accounts[0], { from: accounts[0] });
+        await swap.buyHedge (toWei( 2077), accounts[0], { from: accounts[0] });
 
         const wethBalBefore = await weth.balanceOf.call(accounts[0])
 
         await params.setFee(toWei(0.01))
         await eusd.approve(swap.address, toWei( 2077), { from: accounts[0] })
-        await swap.sellFloat (toWei( 2077), accounts[0], { from: accounts[0] });
+        await swap.sellHedge (toWei( 2077), accounts[0], { from: accounts[0] });
 
         const wethBalAfter = await weth.balanceOf.call(accounts[0])
 
@@ -707,9 +707,9 @@ contract("Swap", accounts => {
         await eusd.approve(swap.address, toWei(10101), { from: accounts[1] })
         await eusd.approve(swap.address, toWei(  304), { from: accounts[2] })
         await leth.approve(swap.address, toWei(   11), { from: accounts[3] })
-        await swap.sellFloat (toWei(10101), accounts[1], { from: accounts[1] });
-        await swap.sellFloat (toWei(  304), accounts[2], { from: accounts[2] });
-        await swap.sellEquity(toWei(   11), accounts[3], { from: accounts[3] });
+        await swap.sellHedge (toWei(10101), accounts[1], { from: accounts[1] });
+        await swap.sellHedge (toWei(  304), accounts[2], { from: accounts[2] });
+        await swap.sellLeverage(toWei(   11), accounts[3], { from: accounts[3] });
 
         const expectedValue = (toWei(2077).mul(toWei(1)).div(/*toWei(1.01*1000)*/ new BN('1010101010101010101010')))
 

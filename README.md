@@ -1,60 +1,105 @@
-# Volatility Swap Stablecoin System
-Mint synthetic assets and crypto derivatives
-VSSS has two product offerings, a stablecoin and an unstable (i.e. leveraged) coin.  
-  
-Both tokens are collateralized with the same underlying asset. The stablecoin maintains a peg to a target asset, for example USD, via a price feed. Conversely, the unstablecoin offeres leveraged exposure to the underlying asset.
+# Equity Swap Synthetic Assets
+A system of derivatives contracts for creating fully-collateralized synthetic assets (aka stablecoins) on Ethereum.
 
-Essentially, it's an equity swap contract with tokenized floating and equity legs, with payments and collateral in the reference equity.
+## Using The Contract
+To gain exposure to the denominating asset (e.g. USD), simply buy into the protection buyer pool with `buyHedge(amount, to)`.
+To gain leveraged exposure to the reference asset (e.g. ETH), buy into the protection seller pool with `buyLeverage(amount, to)`
+Each operation requires payment in the reference asset and returns a synthetic asset representing your stake in the pool.
+You can sell out of either pool at any time with `sellHedge(amount, to)` and `sellLeverage(amount, to)`.
 
-# How It Works
-Each Swap contract creates two synthetic assets whose values are determined by a price feed and backed by an underlying asset. Either synthetic asset can be minted or burned on-demand by depositing/withdrawing some of the underlying asset into/out of the Swap contract. For example, in an ETH/USD contract, you can deposit ETH to mint either synthetic USD or leveraged ETH, or you can withdraw ETH by burning synthetic USD or leveraged ETH.
+## Nomenclature
+### Swap Contracts
+Contracts are defined by their reference equity and denominating asset, for example "ETH/USD".
+## Tokens
+The symbol for the synthetic asset representing the protection buyer pool is its target asset followed by its collateralizing asset in superscript. For the protection seller pool, the synthetic asset's symbol is the reference equity followed by the denominating asset in suprscript, all preceded by an "x".
+
+For example,
+ETH/USD hedge token:    USDᵉᵗʰ,  or Ether-collateralized synthetic USD
+ETH/USD leverage token: xETHᵘˢᵈ, or leveraged Ether (USD)
 
 
+## How It Works   
+The core of the system is the Swap contract. It works similarly to an equity swap in traditional finance, where cashflows are exchanged between two parties based on the performance of a reference asset and a floating interest rate. But rather than the two counterparties being individual companies or people, they're represented as two stake pools, each with its own token.
+In addition,
+  1. The two stake pools, representing the protection buyers and protection sellers, can be permissionlessly entered into or exited out of at any time.
+  2. Payments and collateral (on both sides) are in the reference equity.
+  3. Payments are made whenever the price of the reference equity changes, rather than on predetermined dates. (In actuality, payments are never "made", but pool sizes are recalculated for each buy or sell)
+  4. The notional principal changes as traders enter or exit the protection buyer pool and as interest payments are made
+  5. The interest rate is a function of the relative size of the two stake pools (i.e. the collateral ratio) rather than an external index such as LIBOR.
+  6. The reference equity is an ERC20 token such as WETH or WBTC.
+  7. The asset denominating the notinal principal can be any currency, equity, index, etc for which a price feed exists.
 
+### Interest Rate
+Interest payments are made from the protection seller pool to the protection buyer pool on an hourly basis. Each swap contract has its own variable interest rate, used to target a collateralization ratio by changing the relative demand for the two tokens. Interest payments are automatically reinvested.
 
-## Properties of the system
-L = leverage of the unstable (i.e. leveraged) coin  
-R = collateralization ratio  
-C = value of all locked collateral  
-S = value of the total supply of the stablecoin  
+Currently, the rate (R) is proportional of the contract's collateral ratio (C):
 
-where R = C/S
+R = 0.2 * R - 0.28
 
-L varies with R such that the following is always true:
+This interest rate model may change in the future.
 
-    
-| L = R / (R - 1) |
+### Fees
+There's a 0.1% fee on all buys and sells that goes to existing stakeholders. The fee is put into the protection seller pool and, in turn, factored into the interest rate paid to the protection buyer pool via market forces.
+
+Value is conserved within each swap contract. No disbursements of any kind are transferred out.
+
+The fees serve to prevent soft frontrunning, where traders may have advance knoledge of price oracle updates.
+
+### Calculating leverage
+
+| L = C / (C - 1) |
 | --------------- |
+
+where
+
+L = leverage of the leveraged coin
+C = collateralization ratio
+
+and
+
+C = (E + P) / P
+
+where
+
+E = value of protection seller pool
+P = The Notional principal / value of protection buyer pool
   
-  
-<img src="https://user-images.githubusercontent.com/13501607/150663503-7f72bbd7-2fb9-46fb-9ca5-0dc333cd9ddb.png" width="50%" height="50%">
+<!-- <img src="https://user-images.githubusercontent.com/13501607/150663503-7f72bbd7-2fb9-46fb-9ca5-0dc333cd9ddb.png" width="50%" height="50%">
 
   
 - Market forces determine R and keep it above 1:  
   - As R falls closer to 1:  
     - L increases asymptotically toward infinity, increasing demand for the unstablecoin. R rises again as unstablecoins are bought.  
-    - Risk of the peg breaking becomes greater, decreasing demand for the stablecoin. R rises again as stablecoins are sold.  
+    - Risk of the peg breaking becomes greater, decreasing demand for the stablecoin. R rises again as stablecoins are sold.   -->
+
+## Composing swaps
+The synthetic asset created from one swap can be used as reference equity/underlying asset in another swap. In other words, the token outputs of one swap can be used as the token input to another.
+
+### Shorting
+E.g. use the USDᵉᵗʰ from the ETH/USD swap to create a USDᵉᵗʰ/ETH swap
+Creates ETHᵘˢᵈ (USDᵉᵗʰ-collateralized synthetic ETH) and xUSDᵉᵗʰ (Shorted ETH (USD))
+
+leverage = 1 - xETHᵘˢᵈ leverage
+So if ETH/USD is 150% collateralized and thus xETHᵘˢᵈ offers 3x leverage, our short has 1 - 3 = -2x leverage
+
+ETH -> xETHᵘˢᵈ
+       USDᵉᵗʰ -> ETHᵘˢᵈ
+                 xUSDᵉᵗʰ
+
+### Squaring
+E.g. use the xETHᵘˢᵈ created from the ETH/USD swap to create a xETHᵘˢᵈ/USD swap
+Creates USDˣᵉᵗʰ and xETH²ᵘˢᵈ
+Gives more leverage
+
+## Multi-collateral Stablecoin
+Create an sUSD/USD swap where sUSD is a blend of different synthetic USD assests, such as ones with different collateral types or collateralization ratios.
+For example, combine esUSD (ETH-collateralized Synthetic USD) and lsUSD (LINK-collateralized Synthetic USD) into a single sUSD, and use that as the underlying asset in a sUSD/USD swap.
+The ssUSD created from the sUSD/USD swap will be able to hold its peg even if lsUSD or esUSD (and thus sUSD) lose their pegs.
+Those taking the other side of the trade are taking on the risk of sUSD losing its peg but are being compensated with interest payments. 
 
 
-# Fees
-There's a 0.1% fee on trades, given to equity and floating leg holders. The fee is put into the equity leg pool and, in turn, factored into the interest rate via market forces.
-
-Value is conserved within each swap contract. No disbursements of any kind are transferred out of the system.
-
-## One-time Fees
-Every buy (mint) or sell (burn) has an associated fee that's proportional to the value of the trade. All proceeds from fees are put into the floating-leg pool, meaning they're given to floating-leg token holders.   
-The fees have 3 main purposes. They:   
-    1. serve as a last line of defence against soft frontrunning
-    2. provide a way for fixed-leg holders to pay floating-leg holders without having to set a negative interest rate
-    3. signal a minimum-intended time horizon for those buying in to either leg of the swap
-
-## Interest Rate
-Interest payments are made from floating-leg holders to fixed-leg holders on an hourly basis. Each swap contract has its own variable interest rate, used to target a collateralization ratio by changing the relative demand for fixed- and floating-leg tokens. Interest payments are automatically reinvested.
-
-future: use PID controller design to adjust interest rate to maintain target collateralization ratio.
-
-
-## The MakerDAO Killer
+## Comparison to existing projects
+## MakerDAO
 The products offered by VSSS are very similar to those of MakerDAO but require zero maintainence, have no fees and are easier to conceptualize. Similar to DAI, VSSS's stablecoin is overcollateralized with an underlying asset such as ETH. And similar to a CDP, VSSS's unstablecoin offers leveraged exposure to said underlying asset. But, unlike MakerDAO's CDPs, VSSS's unstablecoins are fungible just like any other token. They're liquid and can be bought or sold on exchanges with little hastle or premiums.
   
 ### Equivalence to MakerDAO
@@ -92,52 +137,18 @@ The VSSS is much simpler than MakerDAO, requiring no external services or auctio
 DAI is collateralized with a mix of assets, including ETH, BAT, and USDC. Having a diverse porfolio of collateral assets mitigates risk of the system becoming undercollateralized.  
 Each VSSS is collateralized with only one asset, but multliple VSSSs will be deployed, each with its own collateral. This allows the trader a choice in the types and ratios of the collateral underlying their hedge. Alternatively, a blended collateral contract is planned to mix multiple collateral types into one, allowing for a multi-collateral stablecoin.
 
-# Possible Attack Vectors
-## Frontrunning
+## Possible Attack Vectors
+### Frontrunning
 A successful frontrunning attack could steal gains from or magnify losses of honest participants, so it's imperative that it's never possible.   
    
-## Frontrunning Price Oracle Updates
+### Frontrunning Price Oracle Updates
 This involves an attacker watching the mempool for a price oracle update then submitting a buy or sell transaction infront of it to make a risk-free profit from the price change. The Swap contract prevents this by enforcing a maximum allowed priority fee on all buy or sell transactions, preventing the attacker from setting a high enough priority fee to get his transaction in front of the price oracle update transaction. This works as long as the max allowed priority fee is less than the price oracle update transaction's priority fee, which should always be the case.   
    
-## Soft Frontrunning
-In theory it's possible for an attacker to predict a price orace update before the transaction even enters the mempool by looking at off-chain data such as prices on centralized exchanges. Trading on this advanced price knowledge is sometimes called "soft frontrunning", and VSSS has two lines of defence against it. First, a low enough priority fee limit will add a delay to any buy or sell transactions, giving the price oracle time to update. This works as long as the network is at least somewhat congested (i.e. as long as blocks are being filled). Second, every buy or sell has an associated fee that makes a price change of a given amount unprofitable. If, for example, the price change tolerance were set to 1%, the price would need to change by more than 1% for gains to be greater than the trade's fee.   
+### Soft Frontrunning
+In theory it's possible for an attacker to predict a price orace update before the transaction even enters the mempool by looking at off-chain data such as prices on centralized exchanges. Trading on this advanced price knowledge is sometimes called "soft frontrunning", and VSSS has two lines of defence against it. First, a low enough priority fee limit will add a delay to any buy or sell transactions, giving the price oracle time to update. This works as long as the network is at least somewhat congested (i.e. as long as blocks are being filled). Second, every buy or sell has an associated fee that makes a price change of a given amount unprofitable. If, for example, the price change tolerance were set to 1%, the price would need to change by more than 1% for gains to be greater than the trade's fee.
 
 
-# Composability (Derivatives legos)
-Use synthetic assets as the underlying asset for other swap contracts. i.e. collateralize synthetic assets with other synthetic assets. The token outputs from one swap contract can be used as inputs to others.    
-
-Is it a bad idea?     
-  - It isn't necessary since a single contract can track any asset or index and use any ERC20 as collateral
-  - adds friction (time and gas costs) to entering/exiting positions
-  - undercollateralization of dependant contracts adds complications
-  - creates redundant synthetic tokens e.g. sUSD/ETH's resulting sETH
-    - you can just hold ETH, or have the cashflow equivalent of sETH by holding lETH and ETH/hETH's hETH
-
-## Shorting
-E.g. use the sUSD created from the ETH/USD swap to create an sUSD/ETH swap
-Adds shorting without writing any more code. cool!
-leverage is 1 - lETH leverage. So if ETH/USD is 150% collateralized and thus lETH offers 3x leverage, our short has 1 - 3 = -2x leverage
-
-## Squaring
-E.g. use the lETH created from the ETH/USD swap to create a lETH/USD swap
-or should it be a lETH/sUSD swap? Would be safe to do since it will always undercollateralize before sUSD. Shouldn't make much difference tho, 
-It's a swap squared (ETH/USD)^2
-Gives more leverage
-open question: Is this better in any way than just deploying another ETH/USD swap with a lower collateralization ratio?
-  - takes the same price change to cause undercollateralization. So that's not any better
-  - costs more gas to enter into position. So that's worse
-  - lETH/USD swap TVL all goes to overcollateralizing ETH/USD swap: not sure if this is better
-  - interest payments would go from l2ETH -> l1ETH -> s1USD
-Probs not useful initaially but could do if degens want MOAR LEVERAGE withought increaseing risk of default for existing holders
-
-# Multi-collateral Stablecoin
-Create an sUSD/USD swap where sUSD is a blend of different synthetic USD assests, such as ones with different collateral types or collateralization ratios.
-For example, combine esUSD (ETH-collateralized Synthetic USD) and lsUSD (LINK-collateralized Synthetic USD) into a single sUSD, and use that as the underlying asset in a sUSD/USD swap.
-The ssUSD created from the sUSD/USD swap will be able to hold its peg even if lsUSD or esUSD (and thus sUSD) lose their pegs.
-Those taking the other side of the trade are taking on the risk of sUSD losing its peg but are being compensated with interest payments. 
-
-
-# Behavior in event of undercollateralization
+## Behavior in event of undercollateralization
 The remaining collateral is split among fixed-leg token holders. Floating-leg tokens can't be minted or burned. Fixed-leg tokens can be minted or burned for [total collateral] / [fixed-leg total supply]
 
 Open question: what's the value of the floating-leg tokens?
@@ -148,8 +159,8 @@ Open question: what's the value of the floating-leg tokens?
       - is the value of the collaeral > the value of the token?
         - yes: has the same downside potential with less upside potential
 
-## Alternative behaviors
-### Graceful default
+### Alternative behaviors
+#### Graceful default
 - mostly implemented on another branch but decided against going this way
 
 Ratchet down the target value of fixed-leg tokens when the price drops such that the collateralization ratio can never be < 1
@@ -165,27 +176,12 @@ could be the way to go.
   - more catastrophic for fixed-leg holders if there's a default. BUT less so for floating-leg holders
   - more code when we could just redeploy. It's never supposed to happen anyway
 
-### Pay interest on floating-leg total value
-Rather than on fixed-leg total value, the current behavior
-pros:
-  - helps keep system at equlibrium
-    - if coll ratio decreases:
-      - fixed-leg interest rate decreases
-      - interest on float-leg notional value (i.e. margin) decreases
-  - lets system find a competitive fixed-leg interest rate
-    - based on the market interest rate for margin
-cons:
-  - implementation is much more complex
-    - size of float-leg pool changes continuously over time making interest payment calculations difficult
-      - well, almost continuously. Changes every price feed update
-    - might be easier to just periodically update the fixed-leg interest rate based on float-leg size
 
 
 
 # TODO
 - update solidity version
-- change naming
-  - Volatility Swap -> Equity Swap
+- ? implement IArbToken https://github.com/OffchainLabs/token-bridge-contracts/blob/main/contracts/tokenbridge/arbitrum/IArbToken.sol
 - look into using super cheap exp() function
 - consolidate premium rates functions
 - make sure not vulnerable to erc 777 reentry

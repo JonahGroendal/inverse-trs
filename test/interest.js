@@ -38,7 +38,7 @@ contract("Interest", accounts => {
 
     it("should correctly calculate float value at the current interest rate", async () => {
         await feed.setPrice(toWei(1000));
-        const rate = await interest.floatValueNominal(toWei(1));
+        const rate = await interest.hedgeValueNominal(toWei(1));
         const multiplier = await interest.accrewedMul.call()
         const expected = multiplier.mul(new BN('10000000000')).div(toWei(1000))
 

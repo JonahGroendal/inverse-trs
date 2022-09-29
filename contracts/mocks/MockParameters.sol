@@ -9,9 +9,9 @@ contract MockParameters is IParameters {
 
     IPrice immutable price;
 
-    IToken immutable fixedLeg;
+    IToken immutable hedge;
 
-    IToken immutable floatLeg;
+    IToken immutable leverage;
 
     IToken immutable underlying;
 
@@ -19,20 +19,20 @@ contract MockParameters is IParameters {
         uint _fee,
         IModel _model,
         IPrice _price,
-        IToken _fixedLeg,
-        IToken _floatLeg,
+        IToken _hedge,
+        IToken _leverage,
         IToken _underlying)
     {
         fee        = _fee;
         model      = _model;
         price      = _price;
-        fixedLeg   = _fixedLeg;
-        floatLeg   = _floatLeg;
+        hedge      = _hedge;
+        leverage   = _leverage;
         underlying = _underlying;
     }
 
     function get() public view returns (uint, IModel, IPrice, IToken, IToken, IToken) {
-        return (fee, model, price, fixedLeg, floatLeg, underlying);
+        return (fee, model, price, hedge, leverage, underlying);
     }
 
     function setFee(uint _fee) public {

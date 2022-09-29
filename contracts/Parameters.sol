@@ -14,17 +14,17 @@ contract Parameters is IParameters {
     /// @notice Price of underlying in target asset
     IPrice immutable price;
 
-    /// @notice Tokens comprising the swap's float leg
+    /// @notice Tokens representing the swap's protection buyers
     /// @notice Pegged to denominating asset + accrewed interest
     /// @dev Must use 18 decimals
-    IToken immutable floatLeg;
+    IToken immutable hedge;
 
-    /// @notice Tokens comprising the swap's equity leg
+    /// @notice Tokens representing the swap's protection sellers
     /// @notice Pegged to [R/(R-1)]x leveraged underlying
     /// @dev Must use 18 decimals
-    IToken immutable equityLeg;
+    IToken immutable leverage;
 
-    /// @notice Token collateralizing floatLeg / underlying equityLeg
+    /// @notice Token collateralizing hedge / underlying leverage
     /// @dev Must use 18 decimals
     IToken immutable underlying;
 
@@ -32,19 +32,19 @@ contract Parameters is IParameters {
         uint _fee,
         IModel _model,
         IPrice _price,
-        IToken _floatLeg,
-        IToken _equityLeg,
+        IToken _hedge,
+        IToken _leverage,
         IToken _underlying)
     {
         fee        = _fee;
         model      = _model;
         price      = _price;
-        floatLeg   = _floatLeg;
-        equityLeg   = _equityLeg;
+        hedge      = _hedge;
+        leverage   = _leverage;
         underlying = _underlying;
     }
 
     function get() public view returns (uint, IModel, IPrice, IToken, IToken, IToken) {
-        return (fee, model, price, floatLeg, equityLeg, underlying);
+        return (fee, model, price, hedge, leverage, underlying);
     }
 }
