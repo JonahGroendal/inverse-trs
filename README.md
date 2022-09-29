@@ -16,7 +16,7 @@ This system is not audited. The swap contract is quite small and I did my best t
 
 #### Administered
 The Swap and Token contracts are administed and upgradeable by me, but they're behind a one-week timelock.
-This enforces that I must announce any parameter changes or upgrades a week in advance, giving traders time to exit the system in the event that I try to do something malicious.
+This enforces that I must announce any parameter changes or upgrades a week in advance, giving traders time to exit the system.
 
 ## Nomenclature
 ### Swap Contracts
@@ -53,7 +53,7 @@ There's a 0.1% fee on all buys and sells that goes to existing stakeholders. The
 
 Value is conserved within each swap contract. No disbursements of any kind are transferred out.
 
-The fees serve to prevent soft frontrunning, where traders may have advance knoledge of price oracle updates.
+The fees serve to prevent soft frontrunning, where traders may have advance knowledge of price oracle updates.
   
 ### Calculating leverage
 
