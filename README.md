@@ -7,6 +7,17 @@ To gain leveraged exposure to the reference asset (e.g. ETH), buy into the prote
 Each operation requires payment in the reference asset and returns a synthetic asset representing your stake in the pool.  
 You can sell out of either pool at any time with `sellHedge(amount, to)` and `sellLeverage(amount, to)`.
 
+### Deployments
+TODO
+
+### Risks
+#### Not Audited
+This system is not audited. The swap contract is quite small and I did my best to ensure it's not vulnerable to any exploits, but I cannot guarantee that it's safe.
+
+#### Administered
+The Swap and Token contracts are administed and upgradeable by me, but they're behind a one-week timelock.
+This enforces that I must announce any parameter changes or upgrades a week in advance, giving traders time to exit the system in the event that I try to do something malicious.
+
 ## Nomenclature
 ### Swap Contracts
 Contracts are defined by their reference equity and denominating asset, for example "ETH/USD".

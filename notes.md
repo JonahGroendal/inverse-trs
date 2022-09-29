@@ -44,4 +44,4 @@ could be the way to go.
 - update solidity version
 - ? implement IArbToken https://github.com/OffchainLabs/token-bridge-contracts/blob/main/contracts/tokenbridge/arbitrum/IArbToken.sol
   - can upgrade Token contract later
-- add info about automatic deleveraging, how collateralization ratio is maintained, and ownership/timelock
+- add info about automatic deleveraging, how collateralization ratio is maintained
