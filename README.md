@@ -123,6 +123,9 @@ Also, ESSA is much simpler than MakerDAO, requiring no external services or auct
 DAI is collateralized with a mix of assets, including ETH, BAT, and USDC. Having a diverse porfolio of collateral assets mitigates risk of the system becoming undercollateralized.  
 Each ESSA swap contract is collateralized with only one asset, but multliple contracts will be deployed, each with its own collateral. This allows traders a choice in the types and ratios of the collateral underlying their hedges. Alternatively, a blended collateral contract is planned to mix multiple collateral types into one, allowing for a multi-collateral stablecoin.
 
+### Synthetix
+From an end user's perspective, ESSA and Synthetix are very similar: they both offer collateralized synthetic assets, but under the hood there are a number of differences. Nost notably, the type of collateral used and the segmentation of debt. Synthetix uses its own native token to collateralize all its synths in a 'pooled debt' model. ESSA, on the other hand, uses only existing crypto assets such as ETH and segments debt between each of its synths.
+
 ## Possible Attack Vectors
 ### Frontrunning / Sandwiching
 A successful frontrunning attack could steal gains from or magnify losses of honest participants, so it's imperative that it's never possible.   
