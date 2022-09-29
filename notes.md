@@ -29,9 +29,19 @@ could be the way to go.
   - more catastrophic for fixed-leg holders if there's a default. BUT less so for floating-leg holders
   - more code when we could just redeploy. It's never supposed to happen anyway
 
+# Similar projects
+- USM: https://jacob-eliosoff.medium.com/whats-the-simplest-possible-decentralized-stablecoin-4a25262cf5e8
+  - turns out this is pretty much the same project but there are some differences:
+    - Has a minimum collateral ratio that disables funders' (i.e. protection sellers) withdrawls if below it
+    - Doesn't have an interest rate mechanism
+    - Fee calculations are very different. Almost like an AMM
+- https://github.com/shortdoom/stablecoin-fun
+  - based on OSM but has erc-4626 interface. Uses custom functions for volitile token, not ideal.
+
+
 
   # TODO
 - update solidity version
 - ? implement IArbToken https://github.com/OffchainLabs/token-bridge-contracts/blob/main/contracts/tokenbridge/arbitrum/IArbToken.sol
   - can upgrade Token contract later
-- add info about automatic deleveraging and how collateralization ratio is maintained
+- add info about automatic deleveraging, how collateralization ratio is maintained, and ownership/timelock

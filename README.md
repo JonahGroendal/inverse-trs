@@ -17,7 +17,7 @@ For example,
 ETH/USD hedge token:  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USDᵉᵗʰ,  or Ether-collateralized synthetic USD  
 ETH/USD leverage token: xETHᵘˢᵈ, or leveraged Ether (USD)
 
-## How It Works   
+## How It Works
 The core of the system is the Swap contract. It works similarly to an equity swap in traditional finance, where cashflows are exchanged between two parties based on the performance of a reference asset and a floating interest rate. But rather than the two counterparties being individual companies or people, they're represented as two stake pools, each with its own token.
 In addition,
   1. The two stake pools, representing the protection buyers and protection sellers, can be permissionlessly entered into or exited out of at any time.
@@ -88,15 +88,12 @@ Creates USDˣᵉᵗʰ and xETH²ᵘˢᵈ
 Gives more leverage
 
 ## Multi-collateral Stablecoin
-Create an sUSD/USD swap where sUSD is a blend of different synthetic USD assests, such as ones with different collateral types or collateralization ratios.
-For example, combine esUSD (ETH-collateralized Synthetic USD) and lsUSD (LINK-collateralized Synthetic USD) into a single sUSD, and use that as the underlying asset in a sUSD/USD swap.  
-The ssUSD created from the sUSD/USD swap will be able to hold its peg even if lsUSD or esUSD (and thus sUSD) lose their pegs.
-Those taking the other side of the trade are taking on the risk of sUSD losing its peg but are being compensated with interest payments. 
-
+Create a USDᵇˡᵉⁿᵈ/USD swap where USDᵇˡᵉⁿᵈ is a blend of different synthetic USD assests, such as ones with different collateral types or collateralization ratios.  
+For example, combine USDᵉᵗʰ and USDˡⁱⁿᵏ into a single USDᵇˡᵉⁿᵈ, and use that as the underlying asset in a USDᵇˡᵉⁿᵈ/USD swap.  The resulting USDᵘˢᵈ will be able to hold its peg even if USDˡⁱⁿᵏ or USDᵉᵗʰ (and thus USDᵇˡᵉⁿᵈ) lose their pegs.
 
 ## Comparison to existing projects
 ### MakerDAO
-The products offered by ESSA are very similar to those of MakerDAO but require zero maintainence, have no fees and are easier to conceptualize. Similar to DAI, ESSA's stablecoin is overcollateralized with an underlying asset such as ETH. And similar to a CDP, ESSA's protection seller pool token offers leveraged exposure to said underlying asset. But, unlike MakerDAO's CDPs, ESSA's unstablecoins are fungible just like any other token. They're liquid and can be bought or sold on exchanges with little hastle or premiums.
+The products offered by ESSA are very similar to those of MakerDAO but require zero maintainence, have no fees and are easier to conceptualize. Similar to DAI, ESSA's stablecoin is overcollateralized with an underlying asset such as ETH. And similar to a CDP, ESSA's protection seller pool token offers leveraged exposure to said underlying asset. But, unlike MakerDAO's CDPs, protection seller pool tokens are fungible just like any other They're liquid and can be bought or sold on exchanges with little hastle or premiums.
 #### Differences
 DAI is a soft-pegged stablecoin with a hard-pegged collateralization ratio. ESSA's USDᵉᵗʰ, is the opposite. It's hard pegged to its price feed but has a soft-pegged collateralization ratio. Similar to how the value of DAI is maintained, the collateralization ratio of USDᵉᵗʰ is maintained through adjustments to the intererest rate. Unlike DAI, the interest rate is updated according to an interst rate model.
 
@@ -127,14 +124,3 @@ In theory it's possible for an attacker to predict a price orace update before t
 
 ## Behavior in event of undercollateralization
 If the value of the protection seller pool drops to zero, the remaining collateral in the protection buyer pool is split among stablecoin holders. Protection seller tokens can't be minted or burned durring this time.
-
-
-# Similar projects
-- USM: https://jacob-eliosoff.medium.com/whats-the-simplest-possible-decentralized-stablecoin-4a25262cf5e8
-  - turns out this is pretty much the same project but there are some differences:
-    - Has a minimum collateral ratio that disables funders' (i.e. protection sellers) withdrawls if below it
-    - Doesn't have an interest rate mechanism
-    - Fee calculations are very different. Almost like an AMM
-- https://github.com/shortdoom/stablecoin-fun
-  - based on OSM but has erc-4626 interface. Uses custom functions for volitile token, not ideal.
-
