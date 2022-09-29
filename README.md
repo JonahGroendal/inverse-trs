@@ -21,7 +21,7 @@ This enforces that I must announce any parameter changes or upgrades a week in a
 ## Nomenclature
 ### Swap Contracts
 Contracts are defined by their reference equity and denominating asset, for example "ETH/USD".
-## Tokens
+### Tokens
 The symbol for the synthetic asset representing the protection buyer pool is its target asset followed by its collateralizing asset in superscript. For the protection seller pool, the synthetic asset's symbol is the reference equity followed by the denominating asset in suprscript, all preceded by an "x".
 
 For example,  
@@ -38,7 +38,7 @@ In addition,
   5. The interest rate is a function of the relative size of the two stake pools (i.e. the collateral ratio) rather than an external index such as LIBOR.
   6. The reference equity is an ERC20 token such as WETH or WBTC.
   7. The asset denominating the notinal principal can be any currency, equity, index, etc for which a price feed exists.
-
+  
 ### Interest Rate
 Interest payments are made from the protection seller pool to the protection buyer pool on an hourly basis. Each swap contract has its own variable interest rate, used to target a collateralization ratio by changing the relative demand for the two tokens. Interest payments are automatically reinvested.
 
@@ -47,14 +47,14 @@ Currently, the annual rate (R) is proportional of the contract's collateral rati
 R = 0.2 * R - 0.28
 
 This interest rate model may change in the future.
-
+  
 ### Fees
 There's a 0.1% fee on all buys and sells that goes to existing stakeholders. The fee is put into the protection seller pool and, in turn, factored into the interest rate paid to the protection buyer pool via market forces.
 
 Value is conserved within each swap contract. No disbursements of any kind are transferred out.
 
 The fees serve to prevent soft frontrunning, where traders may have advance knoledge of price oracle updates.
-
+  
 ### Calculating leverage
 
 | L = C / (C - 1) |
@@ -98,7 +98,7 @@ E.g. use the xETHᵘˢᵈ created from the ETH/USD swap to create a xETHᵘˢᵈ
 Creates USDˣᵉᵗʰ and xETH²ᵘˢᵈ  
 Gives more leverage
 
-## Multi-collateral Stablecoin
+### Multi-collateral Stablecoin
 Create a USDᵇˡᵉⁿᵈ/USD swap where USDᵇˡᵉⁿᵈ is a blend of different synthetic USD assests, such as ones with different collateral types or collateralization ratios.  
 For example, combine USDᵉᵗʰ and USDˡⁱⁿᵏ into a single USDᵇˡᵉⁿᵈ, and use that as the underlying asset in a USDᵇˡᵉⁿᵈ/USD swap.  The resulting USDᵘˢᵈ will be able to hold its peg even if USDˡⁱⁿᵏ or USDᵉᵗʰ (and thus USDᵇˡᵉⁿᵈ) lose their pegs.
 
@@ -126,11 +126,11 @@ Each ESSA swap contract is collateralized with only one asset, but multliple con
 ## Possible Attack Vectors
 ### Frontrunning / Sandwiching
 A successful frontrunning attack could steal gains from or magnify losses of honest participants, so it's imperative that it's never possible.   
-   
-### Frontrunning Price Oracle Updates
+  
+#### Frontrunning Price Oracle Updates
 This involves an attacker watching the mempool for a price oracle update then using a MEV auction to insert a buy or sell transaction infront of it to make a risk-free profit from the price change. Because this possibility, the contrats cannot be deployed on Ethereum L1. Instead they are deployed on Arbitrum One, an L2 where transactions are executed in the order they are received by the sequencer(s).
-
-### Soft Frontrunning
+  
+#### Soft Frontrunning
 In theory it's possible for an attacker to predict a price orace update before the transaction is sent to the sequencer by looking at off-chain data such as prices on centralized exchanges. Trading on this advanced price knowledge is sometimes called "soft frontrunning". To mitigate this, every buy or sell has an associated fee that makes a price change of a given amount unprofitable. If, for example, the fee were set to 0.1%, the price would need to change by more than 0.1% for gains to be greater than the trade's fee.
 
 ## Behavior in event of undercollateralization
