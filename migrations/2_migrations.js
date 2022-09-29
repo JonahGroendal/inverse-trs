@@ -14,7 +14,7 @@ const MockWETH = artifacts.require("MockWETH")
 const MockMath = artifacts.require("MockMath")
 
 const addrs = {
-  arbitrum: {
+  dashboard: { // arbitrum
     chainlinkFeed: "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
     underlying: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
   },
@@ -32,8 +32,9 @@ module.exports = async function (deployer, network, accounts) {
   const isNetwork = networks => (networks.includes(network))
   const isLocal   = isNetwork(['test',   'development'])
   const isTestnet = isNetwork(['goerli', 'goerli-fork'])
+  const isMainnet = isNetwork(['dashboard'])
 
-  if (isLocal || isTestnet) {
+  if (isLocal || isTestnet || isMainnet) {
     if (isLocal) {
       await deployer.deploy(MockMath)
       await deployer.deploy(MockPrice)

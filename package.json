@@ -8,11 +8,13 @@
   },
   "scripts": {
     "test": "truffle test --compile-all",
-    "migrate-goerli": "truffle migrate --network goerli",
-    "migrate-goerli-dry-run": "truffle migrate --network goerli --dry-run",
-    "verify-goerli": "truffle run verify Swap Token Timelock --network goerli",
     "compile": "truffle compile --all",
-    "clean": "truffle networks --clean"
+    "clean": "truffle networks --clean",
+    "dashboard": "truffle dashboard",
+    "migrate-goerli": "truffle migrate --network goerli",
+    "migrate-dashboard": "truffle migrate --network dashboard",
+    "verify-goerli": "truffle run verify Swap Token Timelock --network goerli",
+    "verify-dashboard": "truffle run verify Swap Token Timelock --network dashboard"
   },
   "repository": {
     "type": "git",
