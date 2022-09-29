@@ -2,9 +2,9 @@
 A system of derivatives contracts for creating fully-collateralized synthetic assets (aka stablecoins) on Ethereum.
 
 ## Using The Contract
-To gain exposure to the denominating asset (e.g. USD), simply buy into the protection buyer pool with `buyHedge(amount, to)`.
-To gain leveraged exposure to the reference asset (e.g. ETH), buy into the protection seller pool with `buyLeverage(amount, to)`
-Each operation requires payment in the reference asset and returns a synthetic asset representing your stake in the pool.
+To gain exposure to the denominating asset (e.g. USD), simply buy into the protection buyer pool with `buyHedge(amount, to)`.  
+To gain leveraged exposure to the reference asset (e.g. ETH), buy into the protection seller pool with `buyLeverage(amount, to)`.  
+Each operation requires payment in the reference asset and returns a synthetic asset representing your stake in the pool.  
 You can sell out of either pool at any time with `sellHedge(amount, to)` and `sellLeverage(amount, to)`.
 
 ## Nomenclature
@@ -13,8 +13,8 @@ Contracts are defined by their reference equity and denominating asset, for exam
 ## Tokens
 The symbol for the synthetic asset representing the protection buyer pool is its target asset followed by its collateralizing asset in superscript. For the protection seller pool, the synthetic asset's symbol is the reference equity followed by the denominating asset in suprscript, all preceded by an "x".
 
-For example,
-ETH/USD hedge token:    USDᵉᵗʰ,  or Ether-collateralized synthetic USD
+For example,  
+ETH/USD hedge token:  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USDᵉᵗʰ,  or Ether-collateralized synthetic USD  
 ETH/USD leverage token: xETHᵘˢᵈ, or leveraged Ether (USD)
 
 ## How It Works   
@@ -51,7 +51,7 @@ The fees serve to prevent soft frontrunning, where traders may have advance knol
 
 where
 
-L = leverage of the leveraged coin
+L = leverage of the leveraged coin  
 C = collateralization ratio
 
 and
@@ -60,7 +60,7 @@ C = (E + P) / P
 
 where
 
-E = value of protection seller pool
+E = value of protection seller pool  
 P = The Notional principal / value of protection buyer pool
   
 <!-- <img src="https://user-images.githubusercontent.com/13501607/150663503-7f72bbd7-2fb9-46fb-9ca5-0dc333cd9ddb.png" width="50%" height="50%">
@@ -75,21 +75,21 @@ P = The Notional principal / value of protection buyer pool
 The synthetic assets created in one swap can be used as the reference equity/underlying asset in other swaps. In other words, the token outputs of one swap can be used as the token input to others.
 
 ### Shorting
-E.g. use the USDᵉᵗʰ from the ETH/USD swap to create a USDᵉᵗʰ/ETH swap
-Creates ETHᵘˢᵈ (USDᵉᵗʰ-collateralized synthetic ETH) and xUSDᵉᵗʰ (Shorted ETH (USD))
-
-ETH -> xETHᵘˢᵈ
-       USDᵉᵗʰ -> ETHᵘˢᵈ
-                 xUSDᵉᵗʰ
+E.g. use the USDᵉᵗʰ from the ETH/USD swap to create a USDᵉᵗʰ/ETH swap  
+Creates ETHᵘˢᵈ (USDᵉᵗʰ-collateralized synthetic ETH) and xUSDᵉᵗʰ (Shorted ETH (USD))  
+  
+ETH -> xETHᵘˢᵈ  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USDᵉᵗʰ -> ETHᵘˢᵈ  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xUSDᵉᵗʰ  
 
 ### Squaring
-E.g. use the xETHᵘˢᵈ created from the ETH/USD swap to create a xETHᵘˢᵈ/USD swap
-Creates USDˣᵉᵗʰ and xETH²ᵘˢᵈ
+E.g. use the xETHᵘˢᵈ created from the ETH/USD swap to create a xETHᵘˢᵈ/USD swap  
+Creates USDˣᵉᵗʰ and xETH²ᵘˢᵈ  
 Gives more leverage
 
 ## Multi-collateral Stablecoin
 Create an sUSD/USD swap where sUSD is a blend of different synthetic USD assests, such as ones with different collateral types or collateralization ratios.
-For example, combine esUSD (ETH-collateralized Synthetic USD) and lsUSD (LINK-collateralized Synthetic USD) into a single sUSD, and use that as the underlying asset in a sUSD/USD swap.
+For example, combine esUSD (ETH-collateralized Synthetic USD) and lsUSD (LINK-collateralized Synthetic USD) into a single sUSD, and use that as the underlying asset in a sUSD/USD swap.  
 The ssUSD created from the sUSD/USD swap will be able to hold its peg even if lsUSD or esUSD (and thus sUSD) lose their pegs.
 Those taking the other side of the trade are taking on the risk of sUSD losing its peg but are being compensated with interest payments. 
 
