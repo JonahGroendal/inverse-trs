@@ -25,7 +25,7 @@ Contracts are defined by their reference equity and denominating asset, for exam
 The symbol for the synthetic asset representing the protection buyer pool is its target asset followed by its collateralizing asset in superscript. For the protection seller pool, the synthetic asset's symbol is the reference equity followed by the denominating asset in suprscript, all preceded by an "x".
 
 For example,  
-ETH/USD hedge token:  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USDᵉᵗʰ,  or Ether-collateralized synthetic USD  
+ETH/USD hedge token: USDᵉᵗʰ, or Ether-collateralized synthetic USD  
 ETH/USD leverage token: xETHᵘˢᵈ, or leveraged Ether (USD)
 
 ## How It Works
@@ -44,7 +44,7 @@ Interest payments are made from the protection seller pool to the protection buy
 
 Currently, the annual rate (R) is proportional of the contract's collateral ratio (C):
 
-R = 0.2 * R - 0.28
+R = 0.2 * C - 0.28
 
 This interest rate model may change in the future.
   
@@ -98,11 +98,11 @@ E.g. use the xETHᵘˢᵈ created from the ETH/USD swap to create a xETHᵘˢᵈ
 Creates USDˣᵉᵗʰ and xETH²ᵘˢᵈ  
 Gives more leverage
 
-### Multi-collateral Stablecoin
+### Multi-Collateral Stablecoin
 Create a USDᵇˡᵉⁿᵈ/USD swap where USDᵇˡᵉⁿᵈ is a blend of different synthetic USD assests, such as ones with different collateral types or collateralization ratios.  
 For example, combine USDᵉᵗʰ and USDˡⁱⁿᵏ into a single USDᵇˡᵉⁿᵈ, and use that as the underlying asset in a USDᵇˡᵉⁿᵈ/USD swap.  The resulting USDᵘˢᵈ will be able to hold its peg even if USDˡⁱⁿᵏ or USDᵉᵗʰ (and thus USDᵇˡᵉⁿᵈ) lose their pegs.
 
-## Comparison to existing projects
+## Comparison to Existing Projects
 ### MakerDAO
 The products offered by ESSA are very similar to those of MakerDAO but require zero maintainence, have no fees and are easier to conceptualize. Similar to DAI, ESSA's stablecoin is overcollateralized with an underlying asset such as ETH. And similar to a CDP, ESSA's protection seller pool token offers leveraged exposure to said underlying asset. But, unlike MakerDAO's CDPs, protection seller pool tokens are fungible just like any other They're liquid and can be bought or sold on exchanges with little hastle or premiums.
 #### Differences
@@ -111,7 +111,7 @@ DAI is a soft-pegged stablecoin with a hard-pegged collateralization ratio. ESSA
 ##### Better Stability with a Variable Collateralization Ratio
 ESSA's stablecoin should achieve greater stability than MakerDAO's DAI by allowing the collateralization ratio to vary with market forces.  
 
-DAI has maintained its peg well for the vast majority of its existence, but durring a sharp drop in ETH price in March 2020, DAI deviated from its peg by over 20%. I believe a hard collateralization ratio was at least partially to blame for the extreme deviation. Burning mass quantities of DAI through CDP liquidations and deleveraging caused demand for DAI to outstrip supply.
+DAI has maintained its peg well for the vast majority of its existence, but during a sharp drop in ETH price in March 2020, DAI deviated from its peg by over 20%. I believe a hard collateralization ratio was at least partially to blame for the extreme deviation. Burning mass quantities of DAI through CDP liquidations and deleveraging caused demand for DAI to outstrip supply.
   
 ESSA always buys back (and burns) its stablecoins at a rate such that the stablecoin exactly holds its peg. To do so at any greater or lesser rate would, by the law of supply and demand, break the peg. This is achieved very simply: users can sell their stablecoins back to the ESSA to be burned at any time for exactly the peg amount. They can also mint new stablecoins for the peg amount.
 
@@ -124,11 +124,11 @@ DAI is collateralized with a mix of assets, including ETH, BAT, and USDC. Having
 Each ESSA swap contract is collateralized with only one asset, but multliple contracts will be deployed, each with its own collateral. This allows traders a choice in the types and ratios of the collateral underlying their hedges. Alternatively, a blended collateral contract is planned to mix multiple collateral types into one, allowing for a multi-collateral stablecoin.
 
 ### Synthetix
-From an end user's perspective, ESSA and Synthetix are very similar: they both offer collateralized synthetic assets, but under the hood there are a number of differences. Nost notably, the type of collateral used and the segmentation of debt. Synthetix uses its own native token to collateralize all its synths in a 'pooled debt' model. ESSA, on the other hand, uses only existing crypto assets such as ETH and segments debt between each of its synths.
+From an end user's perspective, ESSA and Synthetix are very similar. They both offer collateralized synthetic assets but under the hood there are a number of differences. Most notably, the type of collateral used and the segmentation of debt. Synthetix uses its own native token to collateralize all its synths in a 'pooled debt' model. ESSA, on the other hand, uses only existing crypto assets such as ETH and segments debt between each of its synths.
 
 ## Possible Attack Vectors
 ### Frontrunning / Sandwiching
-A successful frontrunning attack could steal gains from or magnify losses of honest participants, so it's imperative that it's never possible.   
+A successful frontrunning attack could steal gains from or magnify losses of honest participants so it's imperative that it's never possible.   
   
 #### Frontrunning Price Oracle Updates
 This involves an attacker watching the mempool for a price oracle update then using a MEV auction to insert a buy or sell transaction infront of it to make a risk-free profit from the price change. Because this possibility, the contrats cannot be deployed on Ethereum L1. Instead they are deployed on Arbitrum One, an L2 where transactions are executed in the order they are received by the sequencer(s).
@@ -136,5 +136,5 @@ This involves an attacker watching the mempool for a price oracle update then us
 #### Soft Frontrunning
 In theory it's possible for an attacker to predict a price orace update before the transaction is sent to the sequencer by looking at off-chain data such as prices on centralized exchanges. Trading on this advanced price knowledge is sometimes called "soft frontrunning". To mitigate this, every buy or sell has an associated fee that makes a price change of a given amount unprofitable. If, for example, the fee were set to 0.1%, the price would need to change by more than 0.1% for gains to be greater than the trade's fee.
 
-## Behavior in event of undercollateralization
-If the value of the protection seller pool drops to zero, the remaining collateral in the protection buyer pool is split among stablecoin holders. Protection seller tokens can't be minted or burned durring this time.
+## Behavior in Event of Undercollateralization
+If the value of the protection seller pool drops to zero, the remaining collateral in the protection buyer pool is split among stablecoin holders. Protection seller tokens can't be minted or burned during this time.
