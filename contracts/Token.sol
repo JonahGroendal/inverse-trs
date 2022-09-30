@@ -31,6 +31,9 @@ contract Token is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Acc
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
 
+    event NameChanged(string newName, address by);
+    event SymbolChanged(string newSymbol, address by);
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -49,6 +52,16 @@ contract Token is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Acc
 
     function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
         _mint(to, amount);  
+    }
+
+    function changeName(string memory name) public onlyRole(UPGRADER_ROLE){
+        _name = name;
+        emit NameChanged(name, msg.sender);
+    }
+
+    function changeSymbol(string memory symbol) public onlyRole(UPGRADER_ROLE){
+        _symbol = symbol;
+        emit SymbolChanged(symbol, msg.sender);
     }
 
     function _authorizeUpgrade(address newImplementation)
