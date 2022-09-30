@@ -22,18 +22,18 @@ This enforces that I must schedule any parameter changes or upgrades a week in a
 ### Swap Contracts
 Contracts are defined by their reference equity and denominating asset, for example "ETH/USD".
 ### Tokens
-The symbol for the synthetic asset representing the protection buyer pool is its target asset followed by its collateralizing asset in superscript. For the protection seller pool, the synthetic asset's symbol is the reference equity followed by the denominating asset in suprscript, all preceded by an "x".
+The symbol for the synthetic asset representing the protection buyer pool is its target asset followed by its collateralizing asset in superscript. For the protection seller pool, it's the reference equity followed by the denominating asset in suprscript, all preceded with an "x".
 
 For example,  
-ETH/USD hedge token: USDᵉᵗʰ, or Ether-collateralized synthetic USD  
-ETH/USD leverage token: xETHᵘˢᵈ, or leveraged Ether (USD)
+ETH/USD hedge token: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USDᵉᵗʰ, or Ether-collateralized synthetic USD  
+ETH/USD leverage token: &nbsp;xETHᵘˢᵈ, or leveraged Ether (USD)
 
 ## How It Works
-The core of the system is the Swap contract. It works similarly to an equity swap in traditional finance, where cashflows are exchanged between two parties based on the performance of a reference asset and a floating interest rate. But rather than the two counterparties being individual companies or people, they're represented as two stake pools, each with its own token.
+The core of the system is the Swap contract. It works similarly to an equity swap in traditional finance, where cashflows are exchanged between two parties based on the performance of a reference asset and a floating interest rate. But rather than the two counterparties being individual companies or people, they're represented as two stake pools, each with its own token.  
 In addition,
   1. The two stake pools, representing the protection buyers and protection sellers, can be permissionlessly entered into or exited out of at any time.
   2. Payments and collateral (on both sides) are in the reference equity.
-  3. Payments are made whenever the price of the reference equity changes, rather than on predetermined dates. (In actuality, payments are never "made", but pool sizes are recalculated for each buy or sell)
+  3. Payments are made whenever the price of the reference equity changes, rather than on predetermined dates. (In reality, payments are never "made", but pool sizes are recalculated for each buy or sell)
   4. The notional principal changes as traders enter or exit the protection buyer pool and as interest payments are made.
   5. The interest rate is a function of the relative size of the two stake pools (i.e. the collateral ratio) rather than an external index such as LIBOR.
   6. The reference equity is an ERC20 token such as WETH or WBTC.
