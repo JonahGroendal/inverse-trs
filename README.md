@@ -26,7 +26,7 @@ The symbol for the synthetic asset representing the protection buyer pool is its
 
 For example,  
 ETH/USD hedge token: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USDᵉᵗʰ, or Ether-collateralized synthetic USD  
-ETH/USD leverage token: &nbsp;xETHᵘˢᵈ, or leveraged Ether (USD)
+ETH/USD leverage token: &nbsp;ETHUSD, or leveraged Ether (USD)
 
 ## How It Works
 The core of the system is the Swap contract. It works similarly to an equity swap in traditional finance, where cashflows are exchanged between two parties based on the performance of a reference asset and a floating interest rate. But rather than the two counterparties being individual companies or people, they're represented as two stake pools, each with its own token.  
@@ -87,15 +87,15 @@ The synthetic assets created in one swap can be used as the reference equity/und
 
 ### Shorting
 E.g. use the USDᵉᵗʰ from the ETH/USD swap to create a USDᵉᵗʰ/ETH swap  
-Creates ETHᵘˢᵈ (USDᵉᵗʰ-collateralized synthetic ETH) and xUSDᵉᵗʰ (Shorted ETH (USD))  
+Creates ETHᵘˢᵈ (USDᵉᵗʰ-collateralized synthetic ETH) and USDETH (Shorted ETH (USD))  
   
-ETH -> xETHᵘˢᵈ  
+ETH -> ETHUSD  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USDᵉᵗʰ -> ETHᵘˢᵈ  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xUSDᵉᵗʰ  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USDETH  
 
 ### Squaring
-E.g. use the xETHᵘˢᵈ created from the ETH/USD swap to create a xETHᵘˢᵈ/USD swap  
-Creates USDˣᵉᵗʰ and xETH²ᵘˢᵈ  
+E.g. use the ETHUSD created from the ETH/USD swap to create a ETHUSD/USD swap  
+Creates USDᵉᵗʰᵘˢᵈ and ETHUSD²  
 Gives more leverage
 
 ### Multi-Collateral Stablecoin
