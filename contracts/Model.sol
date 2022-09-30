@@ -1,4 +1,4 @@
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.0;
 
 import "./IModel.sol";
 
@@ -33,7 +33,7 @@ contract LinearModel is Model {
 }
 
 /// @notice Maintain a constant interest rate wrt value of leverage tokens
-contract ConstantFloatModel is Model {
+contract ConstantModel is Model {
     // there are 8765.82 hours in a year
     int constant FLOAT_RATE = 4 * ONE / 876582; // 4% APR, compounded hourly
 

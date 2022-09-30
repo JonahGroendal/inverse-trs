@@ -1,5 +1,5 @@
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.0;
 
 interface IModel {
-    function getInterestRate(uint potValue, uint floatTV) external view returns (int);
+    function getInterestRate(uint potValue, uint hedgeTV) external view returns (int);
 }

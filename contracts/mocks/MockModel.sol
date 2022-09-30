@@ -1,11 +1,11 @@
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.0;
 
 import "../IModel.sol";
 
 contract MockModel is IModel {
     int private interest;
 
-    function getInterestRate(uint potValue, uint fixedTV) external override view returns (int) {
+    function getInterestRate(uint potValue, uint hedgeTV) external override view returns (int) {
         return interest;
     }
 

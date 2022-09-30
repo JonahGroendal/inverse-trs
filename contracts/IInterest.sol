@@ -1,4 +1,4 @@
-pragma solidity >=0.4.22 <0.9.0;
+pragma solidity ^0.8.0;
 
 interface IInterest {
     function rate() external view returns (uint);

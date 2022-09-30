@@ -43,7 +43,7 @@
     "@openzeppelin/contracts-upgradeable": "^4.7.3",
     "@openzeppelin/truffle-upgrades": "^1.16.0",
     "@truffle/hdwallet-provider": "^2.0.14",
-    "truffle": "^5.5.29"
+    "truffle": "^5.5.31"
   },
   "devDependencies": {
     "eth-gas-reporter": "^0.2.24",
