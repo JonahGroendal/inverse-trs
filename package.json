@@ -13,8 +13,8 @@
     "dashboard": "truffle dashboard",
     "migrate-goerli": "truffle migrate --network goerli",
     "migrate-dashboard": "truffle migrate --network dashboard",
-    "verify-goerli": "truffle run verify Swap Token Timelock --network goerli",
-    "verify-dashboard": "truffle run verify Swap Token Timelock --network dashboard"
+    "verify-goerli": "truffle run verify Swap Token Timelock Parameters Price8Decimal --network goerli",
+    "verify-dashboard": "truffle run verify Swap Token Timelock Parameters Price8Decimal --network dashboard"
   },
   "repository": {
     "type": "git",

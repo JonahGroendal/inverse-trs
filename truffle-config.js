@@ -55,6 +55,10 @@ module.exports = {
       // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
     },
+    dashboard: {
+      maxFeePerGas: 200000000,
+      maxPriorityFeePerGas: 0
+    }
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
     // You should run a client (like ganache-cli, geth or parity) in a separate terminal
@@ -138,6 +142,7 @@ module.exports = {
 
   plugins: ['truffle-plugin-verify'],
   api_keys: {
-    etherscan: 'M1U32EAB8YNJMZYYP93ZTWZJ2T1T2QKQTA'
+    etherscan: 'M1U32EAB8YNJMZYYP93ZTWZJ2T1T2QKQTA',
+    arbiscan: 'Q19TRUJK5YYCJ3EAQQYMJ284WE6Q528M4G'
   }
 };
