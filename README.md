@@ -20,10 +20,9 @@ The Swap and Token contracts are administered and upgradeable by me, but they're
 This enforces that I must schedule any parameter changes or upgrades a week in advance, giving participants time to exit the system.
 
 ## Nomenclature
-### Swap Contracts
-Contracts are defined by their reference asset and denominating asset, for example "ETH/USD".
-### Tokens
-The symbol for the synthetic asset representing the protection buyer pool is its target asset followed by its collateralizing asset in superscript. For the protection seller pool, it's the reference asset followed by the denominating asset in suprscript, all preceded with an "x".
+The swap contract is defined by its reference asset and its denominating asset, for example "ETH/USD".  
+  
+The symbol for the synthetic asset representing the protection buyer pool is its target asset followed by its collateralizing asset in superscript. For the protection seller pool, it's the reference asset followed by the denominating asset in superscript, all preceded with an "x".
 
 For example,  
 ETH/USD hedge token: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USDᵉᵗʰ, or Ether-collateralized synthetic USD  
@@ -103,7 +102,7 @@ Gives more leverage
 ### Multi-Collateral Stablecoin
 Create a USDᵇˡᵉⁿᵈ/USD swap where USDᵇˡᵉⁿᵈ is a blend of different synthetic USD assests, such as ones with different collateral types or collateralization ratios.  
 For example, combine USDᵉᵗʰ and USDˡⁱⁿᵏ into a single USDᵇˡᵉⁿᵈ, and use that as the underlying asset in a USDᵇˡᵉⁿᵈ/USD swap.  The resulting USDᵘˢᵈ will be able to hold its peg even if USDˡⁱⁿᵏ or USDᵉᵗʰ (and thus USDᵇˡᵉⁿᵈ) lose their pegs.
-
+<!-- 
 ## Comparison to Existing Projects
 ### MakerDAO
 The products offered are very similar to those of MakerDAO but require zero maintainence, have no fees and are easier to conceptualize. Similar to DAI, the stablecoin is overcollateralized with an underlying asset such as ETH. And similar to a CDP, the protection seller pool token offers leveraged exposure to said underlying asset. But, unlike MakerDAO's CDPs, protection seller pool tokens are fungible just like any other. They're liquid and can be bought or sold on exchanges with little hastle or premiums.
@@ -127,7 +126,7 @@ Each inverse TRS contract is collateralized with only one asset, but multliple c
 
 ### Synthetix
 From an end user's perspective, ESSA and Synthetix are very similar. They both offer collateralized synthetic assets but under the hood there are a number of differences. Most notably, the type of collateral used and the segmentation of debt. Synthetix uses its own native token to collateralize all its synths in a 'pooled debt' model. ESSA, on the other hand, uses only existing crypto assets such as ETH and segments debt between each of its synths.
-
+-->
 ## Possible Attack Vectors
 ### Frontrunning / Sandwiching
 A successful frontrunning attack could steal gains from or magnify losses of honest participants so it's imperative that it's never possible.   
