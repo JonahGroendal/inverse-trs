@@ -132,7 +132,7 @@ From an end user's perspective, ESSA and Synthetix are very similar. They both o
 A successful frontrunning attack could steal gains from or magnify losses of honest participants so it's imperative that it's never possible.   
   
 #### Frontrunning Price Oracle Updates
-This involves an attacker watching the mempool for a price oracle update then using a MEV auction to insert a buy or sell transaction infront of it to make a risk-free profit from the price change. Because this possibility, the contrats cannot be deployed on Ethereum L1. Instead they are deployed on Arbitrum One, an L2 where transactions are executed in the order they are received by the sequencer(s).
+This involves an attacker watching the mempool for a price oracle update then using a MEV auction to insert a buy or sell transaction infront of it to make a risk-free profit from the price change. Because of this possibility, the contrats cannot be deployed on Ethereum L1. Instead they are deployed on Arbitrum One, an L2 where transactions are executed in the order they are received by the sequencer(s).
   
 #### Soft Frontrunning
 In theory it's possible for an attacker to predict a price orace update before the transaction is sent to the sequencer by looking at off-chain data such as prices on centralized exchanges. Trading on this advanced price knowledge is sometimes called "soft frontrunning". To mitigate this, every buy or sell has an associated fee that makes a price change of a given amount unprofitable. If, for example, the fee were set to 0.1%, the price would need to change by more than 0.1% for gains to be greater than the trade's fee.
