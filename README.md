@@ -9,7 +9,7 @@ You can sell out of either pool at any time with `sellHedge(amount, to)` and `se
 
 ### Deployments
 The swap contract is deployed on Arbitrum and can be interacted with using arbiscan:  
-[0x841fA73a7c8CA0B513c60B3DeEEd498dd3b546Ca](https://arbiscan.io/address/0x841fa73a7c8ca0b513c60b3deeed498dd3b546ca#readProxyContract)
+[0x841fA73a7c8CA0B513c60B3DeEEd498dd3b546Ca](https://arbiscan.io/address/0x841fa73a7c8ca0b513c60b3deeed498dd3b546ca#writeProxyContract)
 
 ### Risks
 #### Not Audited
