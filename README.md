@@ -106,24 +106,24 @@ For example, combine USDᵉᵗʰ and USDˡⁱⁿᵏ into a single USDᵇˡᵉⁿ
 
 ## Comparison to Existing Projects
 ### MakerDAO
-The products offered by ESSA are very similar to those of MakerDAO but require zero maintainence, have no fees and are easier to conceptualize. Similar to DAI, ESSA's stablecoin is overcollateralized with an underlying asset such as ETH. And similar to a CDP, ESSA's protection seller pool token offers leveraged exposure to said underlying asset. But, unlike MakerDAO's CDPs, protection seller pool tokens are fungible just like any other They're liquid and can be bought or sold on exchanges with little hastle or premiums.
+The products offered are very similar to those of MakerDAO but require zero maintainence, have no fees and are easier to conceptualize. Similar to DAI, the stablecoin is overcollateralized with an underlying asset such as ETH. And similar to a CDP, the protection seller pool token offers leveraged exposure to said underlying asset. But, unlike MakerDAO's CDPs, protection seller pool tokens are fungible just like any other. They're liquid and can be bought or sold on exchanges with little hastle or premiums.
 #### Differences
-DAI is a soft-pegged stablecoin with a hard-pegged collateralization ratio. ESSA's USDᵉᵗʰ, is the opposite. It's hard pegged to its price feed but has a soft-pegged collateralization ratio. Similar to how the value of DAI is maintained, the collateralization ratio of USDᵉᵗʰ is maintained through adjustments to the intererest rate. Unlike DAI, the interest rate is updated according to an interst rate model.
+DAI is a soft-pegged stablecoin with a hard-pegged collateralization ratio. USDᵉᵗʰ, on the other hand, is hard pegged to its price feed but has a soft-pegged collateralization ratio. Similar to how the value of DAI is maintained, the collateralization ratio of USDᵉᵗʰ is maintained through adjustments to the intererest rate. Unlike DAI, the interest rate is updated according to an interst rate model.
 
 ##### Better Stability with a Variable Collateralization Ratio
-ESSA's stablecoin should achieve greater stability than MakerDAO's DAI by allowing the collateralization ratio to vary with market forces.  
+The stablecoin should achieve greater stability than MakerDAO's DAI by allowing the collateralization ratio to vary with market forces.  
 
 DAI has maintained its peg well for the vast majority of its existence, but during a sharp drop in ETH price in March 2020, DAI deviated from its peg by over 20%. I believe a hard collateralization ratio was at least partially to blame for the extreme deviation. Burning mass quantities of DAI through CDP liquidations and deleveraging caused demand for DAI to outstrip supply.
   
-ESSA always buys back (and burns) its stablecoins at a rate such that the stablecoin exactly holds its peg. To do so at any greater or lesser rate would, by the law of supply and demand, break the peg. This is achieved very simply: users can sell their stablecoins back to the ESSA to be burned at any time for exactly the peg amount. They can also mint new stablecoins for the peg amount.
+The inverse TRS contract always buys back (and burns) its stablecoins at a rate such that the stablecoin exactly holds its peg. To do so at any greater or lesser rate would, by the law of supply and demand, break the peg. This is achieved very simply: users can sell their stablecoins back to the contract to be burned at any time for exactly the peg amount. They can also mint new stablecoins for the peg amount.
 
 ##### Value is Conserved
-Unlike MakerDAO, ESSA doesn't have a DAO that siphons value out of the system through interest rates or liquidation fees.  
-Also, ESSA is much simpler than MakerDAO, requiring no external services or auction mechanisms. This removes the need for even necessary fees.
+Unlike MakerDAO, there is no DAO that siphons value out of the system through interest rates or liquidation fees.  
+The contract is also much simpler than MakerDAO, requiring no external services or auction mechanisms. This removes the need for even necessary fees.
 
 ##### Single Collateral Type Per System
 DAI is collateralized with a mix of assets, including ETH, BAT, and USDC. Having a diverse porfolio of collateral assets mitigates risk of the system becoming undercollateralized.  
-Each ESSA swap contract is collateralized with only one asset, but multliple contracts will be deployed, each with its own collateral. This allows traders a choice in the types and ratios of the collateral underlying their hedges. Alternatively, a blended collateral contract is planned to mix multiple collateral types into one, allowing for a multi-collateral stablecoin.
+Each inverse TRS contract is collateralized with only one asset, but multliple contracts will be deployed, each with its own collateral. This allows traders a choice in the types and ratios of the collateral underlying their hedges. Alternatively, a blended collateral contract is planned to mix multiple collateral types into one, allowing for a multi-collateral stablecoin.
 
 ### Synthetix
 From an end user's perspective, ESSA and Synthetix are very similar. They both offer collateralized synthetic assets but under the hood there are a number of differences. Most notably, the type of collateral used and the segmentation of debt. Synthetix uses its own native token to collateralize all its synths in a 'pooled debt' model. ESSA, on the other hand, uses only existing crypto assets such as ETH and segments debt between each of its synths.
