@@ -1,4 +1,4 @@
-# Equity Swap Synthetic Assets
+# Inverse Total Return Swap
 A system of derivatives contracts for creating fully-collateralized synthetic assets (aka stablecoins) on Ethereum.
 
 ## Using The Contract
@@ -12,32 +12,33 @@ TODO
 
 ### Risks
 #### Not Audited
-This system is not audited. The swap contract is quite small and I did my best to ensure it's not vulnerable to any exploits, but I cannot guarantee that it's safe.
+The code is not audited. Despite the contract's minimal attack surface, I can't guarantee it's safe to use.
 
 #### Administered
-The Swap and Token contracts are administed and upgradeable by me, but they're behind a one-week timelock.
+The Swap and Token contracts are administered and upgradeable by me, but they're behind a one-week timelock.
 This enforces that I must schedule any parameter changes or upgrades a week in advance, giving participants time to exit the system.
 
 ## Nomenclature
 ### Swap Contracts
-Contracts are defined by their reference equity and denominating asset, for example "ETH/USD".
+Contracts are defined by their reference asset and denominating asset, for example "ETH/USD".
 ### Tokens
-The symbol for the synthetic asset representing the protection buyer pool is its target asset followed by its collateralizing asset in superscript. For the protection seller pool, it's the reference equity followed by the denominating asset in suprscript, all preceded with an "x".
+The symbol for the synthetic asset representing the protection buyer pool is its target asset followed by its collateralizing asset in superscript. For the protection seller pool, it's the reference asset followed by the denominating asset in suprscript, all preceded with an "x".
 
 For example,  
 ETH/USD hedge token: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USDᵉᵗʰ, or Ether-collateralized synthetic USD  
 ETH/USD leverage token: &nbsp;ETHUSD, or leveraged Ether (USD)
 
 ## How It Works
-The core of the system is the Swap contract. It works similarly to an equity swap in traditional finance, where cashflows are exchanged between two parties based on the performance of a reference asset and a floating interest rate. But rather than the two counterparties being individual companies or people, they're represented as two stake pools, each with its own token.  
+The core of the system is the Swap contract. It works similarly to a total return swap in traditional finance, where cashflows are exchanged between two parties based on the performance of a reference asset and a floating interest rate. But rather than the two counterparties being individual companies or people, they're represented as two stake pools, each with its own token.  
 In addition,
   1. The two stake pools, representing the protection buyers and protection sellers, can be permissionlessly entered into or exited out of at any time.
-  2. Payments and collateral (on both sides) are in the reference equity.
-  3. Payments are made whenever the price of the reference equity changes, rather than on predetermined dates. (In reality, payments are never "made", but pool sizes are recalculated for each buy or sell)
-  4. The notional principal changes as traders enter or exit the protection buyer pool and as interest payments are made.
-  5. The interest rate is a function of the relative size of the two stake pools (i.e. the collateral ratio) rather than an external index such as LIBOR.
-  6. The reference equity is an ERC20 token such as WETH or WBTC.
-  7. The asset denominating the notinal principal can be any currency, equity, index, etc for which a price feed exists.
+  2. Payments and collateral (on both sides) are in the reference asset.
+  3. Losses and gains are automatically taken from or added to collateral as the price of the reference asset changes.
+  4. The contract is marked to market (i.e. payments are made between stake pools) continuously as the price changes, rather than on predetermined dates. (In reality, payments are never "made", but pool sizes are recalculated for each buy or sell)
+  5. The notional principal changes as traders enter or exit the protection buyer pool and as interest payments are made.
+  6. The interest rate is a function of the relative size of the two stake pools (i.e. the collateral ratio) rather than an external index such as LIBOR.
+  7. The reference asset is an ERC20 token such as WETH or WBTC.
+  8. The asset denominating the notinal principal can be any currency, equity, index, etc for which a price feed exists.
   
 ### Interest Rate
 Interest payments are made from the protection seller pool to the protection buyer pool on an hourly basis. Each swap contract has its own variable interest rate, used to target a collateralization ratio by changing the relative demand for the two tokens. Interest payments are automatically reinvested.
