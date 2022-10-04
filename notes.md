@@ -44,4 +44,6 @@ could be the way to go.
 - update solidity version
 - ? implement IArbToken https://github.com/OffchainLabs/token-bridge-contracts/blob/main/contracts/tokenbridge/arbitrum/IArbToken.sol
   - can upgrade Token contract later
-- add info about automatic deleveraging, how collateralization ratio is maintained
+- add info about automatic, continuous liquidating
+- add info on how collateralization ratio is maintained
+- look into creating variation of contract that makes stablecoin side short by requiring only a portion of it value be depositied to mint. Model after inverse perpetual futures

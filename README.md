@@ -1,5 +1,5 @@
 # Inverse Total Return Swap
-A simple crypto derivatives contract for creating for creating fully-collateralized synthetic assets (aka stablecoins) on Ethereum.
+A simple crypto derivatives contract for creating fully-collateralized synthetic assets (aka stablecoins) on Ethereum.
 
 ## Using The Contract
 To gain exposure to the denominating asset (e.g. USD), simply buy into the protection buyer pool with `buyHedge(amount, to)`.  
@@ -8,7 +8,8 @@ Each operation requires payment in the reference asset and returns a synthetic a
 You can sell out of either pool at any time with `sellHedge(amount, to)` and `sellLeverage(amount, to)`.
 
 ### Deployments
-TODO
+The swap contract is deployed on Arbitrum and can be interacted with using arbiscan:  
+[0x841fA73a7c8CA0B513c60B3DeEEd498dd3b546Ca](https://arbiscan.io/address/0x841fa73a7c8ca0b513c60b3deeed498dd3b546ca#readProxyContract)
 
 ### Risks
 #### Not Audited
