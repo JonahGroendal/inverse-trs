@@ -1,5 +1,5 @@
 # Inverse Total Return Swap
-A system of derivatives contracts for creating fully-collateralized synthetic assets (aka stablecoins) on Ethereum.
+A simple crypto derivatives contract for creating for creating fully-collateralized synthetic assets (aka stablecoins) on Ethereum.
 
 ## Using The Contract
 To gain exposure to the denominating asset (e.g. USD), simply buy into the protection buyer pool with `buyHedge(amount, to)`.  
