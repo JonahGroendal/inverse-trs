@@ -22,7 +22,7 @@ This enforces that I must schedule any parameter changes or upgrades a week in a
 ## Nomenclature
 The swap contract is defined by its reference asset and its denominating asset, for example "ETH/USD".  
   
-The symbol for the synthetic asset representing the protection buyer pool is its target asset followed by its collateralizing asset in superscript. For the protection seller pool, it's the reference asset followed by the denominating asset in superscript, all preceded with an "x".
+The symbol for the synthetic asset representing the protection buyer pool is its target asset followed by its collateralizing asset in superscript. For the protection seller pool, it's the reference asset followed by the denominating asset.
 
 For example,  
 ETH/USD hedge token: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USDᵉᵗʰ, or Ether-collateralized synthetic USD  
