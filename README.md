@@ -10,7 +10,7 @@ You can sell out of either pool at any time with `sellHedge(amount, to)` and `se
 ### Deployments
 Arbitrum:  
 &nbsp;&nbsp;ETH/USD (uses [WETH](https://arbiscan.io/address/0x82af49447d8a07e3bd95bd0d56f35241523fbab1#writeProxyContract) as underlying asset):  
-&nbsp;&nbsp;&nbsp;&nbsp;swap: [0x841fA73a7c8CA0B513c60B3DeEEd498dd3b546Ca](https://arbiscan.io/address/0x841fa73a7c8ca0b513c60b3deeed498dd3b546ca#readProxyContract)  
+&nbsp;&nbsp;&nbsp;&nbsp;swap: [0x841fA73a7c8CA0B513c60B3DeEEd498dd3b546Ca](https://arbiscan.io/address/0x841fa73a7c8ca0b513c60b3deeed498dd3b546ca#writeProxyContract)  
 &nbsp;&nbsp;&nbsp;&nbsp;USDᵉᵗʰ (hedge token): [0x77431bce81FD447729713DA82C5aD2aBE9E9a472](https://arbiscan.io/address/0x77431bce81fd447729713da82c5ad2abe9e9a472#writeProxyContract)  
 &nbsp;&nbsp;&nbsp;&nbsp;ETHUSD (leverage token): [0xE183a13E641a51c4671dbeE49B3f588A805CADD0](https://arbiscan.io/address/0xe183a13e641a51c4671dbee49b3f588a805cadd0#writeProxyContract)  
 
