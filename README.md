@@ -30,7 +30,7 @@ The symbol for the synthetic asset representing the protection buyer pool is its
 
 For example,  
 ETH/USD hedge token: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USDᵉᵗʰ, or Ether-collateralized synthetic USD  
-ETH/USD leverage token: &nbsp;ETHUSD, or leveraged Ether (USD)
+ETH/USD leverage token: &nbsp;ETHUSD, or Leveraged Ether (USD)
 
 ## How It Works
 The core of the system is the Swap contract. It works similarly to a total return swap in traditional finance, where cashflows are exchanged between two parties based on the performance of a reference asset and a floating interest rate. But rather than the two counterparties being individual companies or people, they're represented as two stake pools, each with its own token.  
