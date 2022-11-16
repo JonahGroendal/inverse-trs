@@ -38,7 +38,7 @@ In addition,
   1. The two stake pools, representing the protection buyers and protection sellers, can be permissionlessly entered into or exited out of at any time.
   2. Payments and collateral (on both sides) are in the reference asset.
   3. Losses and gains are automatically taken from or added to collateral as the price of the reference asset changes.
-  4. The contract is marked to market (i.e. payments are made between stake pools) continuously as the price changes, rather than on predetermined dates. (In reality, payments are never "made", but pool sizes are recalculated for each buy or sell)
+  4. The contract is reset (i.e. payments are made between stake pools) continuously as the price changes, rather than on predetermined dates (In reality, payments are never "made", but pool sizes are recalculated for each buy or sell). The value of the contract itself is always 0.
   5. The notional principal changes as traders enter or exit the protection buyer pool and as interest payments are made.
   6. The interest rate is a function of the relative size of the two stake pools (i.e. the collateral ratio) rather than an external index such as LIBOR.
   7. The reference asset is an ERC20 token such as WETH or WBTC.
