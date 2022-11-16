@@ -133,7 +133,7 @@ From an end user's perspective, ESSA and Synthetix are very similar. They both o
 -->
 ## Possible Attack Vectors
 ### Frontrunning / Sandwiching
-A successful frontrunning attack could steal gains from or magnify losses of honest participants so it's imperative that it's never possible.   
+A successful frontrunning attack could steal gains from or, magnify losses of, honest participants, so it's imperative that it's never possible.   
   
 #### Frontrunning Price Oracle Updates
 This involves an attacker watching the mempool for a price oracle update then using a MEV auction to insert a buy or sell transaction infront of it to make a risk-free profit from the price change. Because of this possibility, the contrats cannot be deployed on Ethereum L1. Instead they are deployed on Arbitrum One, an L2 where transactions are executed in the order they are received by the sequencer(s).
