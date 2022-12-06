@@ -47,12 +47,12 @@ In addition,
 ### Interest Rate
 Interest payments are made from the protection seller pool to the protection buyer pool on an hourly basis. Each swap contract has its own variable interest rate, used to target a collateralization ratio by changing the relative demand for the two tokens. Interest payments are automatically reinvested.
 
-Currently, the annual rate (R) is proportional to the contract's collateral ratio (C):
+Currently, the annual rate (R) is proportional to the contract's collateral ratio (C), and targets a 140-160% collateral ratio at a 0-4% interest rate:
 
 | R = 0.2 * C - 0.28 |
 | ------------------ |
 
-This interest rate model may change in the future.
+This interest rate model or its parameters may change in the future.
   
 ### Fees
 There's a 0.1% fee on all buys and sells that goes to existing stakeholders. The fee is put into the protection seller pool and, in turn, factored into the interest rate paid to the protection buyer pool via market forces.
