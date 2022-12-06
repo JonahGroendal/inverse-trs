@@ -49,7 +49,8 @@ Interest payments are made from the protection seller pool to the protection buy
 
 Currently, the annual rate (R) is proportional to the contract's collateral ratio (C):
 
-R = 0.2 * C - 0.28
+| R = 0.2 * C - 0.28 |
+| ------------------ |
 
 This interest rate model may change in the future.
   
@@ -72,7 +73,8 @@ C = collateralization ratio
 
 and
 
-C = (E + P) / P
+| C = (E + P) / P |
+| --------------- |
 
 where
 
