@@ -47,7 +47,7 @@ In addition,
 ### Interest Rate
 Interest payments are made from the protection seller pool to the protection buyer pool on an hourly basis. Each swap contract has its own variable interest rate, used to target a collateralization ratio by changing the relative demand for the two tokens. Interest payments are automatically reinvested.
 
-Currently, the annual rate (R) is proportional of the contract's collateral ratio (C):
+Currently, the annual rate (R) is proportional to the contract's collateral ratio (C):
 
 R = 0.2 * C - 0.28
 
